@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Inventory Calculator</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs"
+        type="module"></script>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Inventory Calculator</h1>
+
+        <p>
+            Upload today's production PDF to calculate bread requirements.
+        </p>
+
+
+        <!-- ==========================================
+             CURRENT SUPPLY
+             ========================================== -->
+
+        <div class="section">
+
+            <h2>Current Bread Supply</h2>
+
+            <p>
+                Enter the number of packages you currently have.
+            </p>
+
+            <div id="inventoryInputs"></div>
+
+        </div>
+
+
+        <!-- ==========================================
+             PREVIOUS ORDER
+             ========================================== -->
+
+        <div class="section">
+
+            <h2>Previous Order</h2>
+
+            <div id="previousOrderStatus"></div>
+
+            <p id="previousOrderInstructions"></p>
+
+            <div id="previousOrderDate"></div>
+
+            <div id="previousOrderDateWarning"></div>
+
+            <div id="previousOrderInputs"></div>
+
+            <button id="savePreviousOrderButton">
+                Save Previous Order
+            </button>
+
+            <button id="resetPreviousOrderButton">
+                Reset Previous Order
+            </button>
+
+        </div>
+
+
+        <!-- ==========================================
+             PDF UPLOAD
+             ========================================== -->
+
+        <div class="section">
+
+    <h2>Today's Production</h2>
+
+    <input
+        type="file"
+        id="pdfFile"
+        accept=".pdf"
+    >
+
+    <br>
+
+    <button id="analyzeButton">
+        Analyze PDF
+    </button>
+
+    <button
+        id="saveTodaysOrderButton"
+        disabled
+    >
+        Save Today's Order
+    </button>
+
+</div>
+
+
+        <div id="status"></div>
+
+        <div id="results"></div>
+
+    </div>
+
+
+    <script
+        type="module"
+        src="script.js">
+    </script>
+
+</body>
+</html>

@@ -19,90 +19,169 @@
 
         <h1>Inventory Calculator</h1>
 
-        <p>
-            Upload today's production PDF to calculate bread requirements.
-        </p>
-
 
         <!-- ==========================================
-             CURRENT SUPPLY
+             START MENU
              ========================================== -->
 
-        <div class="section">
+        <div id="startMenu" class="section">
 
-            <h2>Current Bread Supply</h2>
+            <h2>What are you doing today?</h2>
 
             <p>
-                Enter the number of packages you currently have.
+                Choose what you would like to work on.
             </p>
 
-            <div id="inventoryInputs"></div>
-
-        </div>
-
-
-        <!-- ==========================================
-             PREVIOUS ORDER
-             ========================================== -->
-
-        <div class="section">
-
-            <h2>Previous Order</h2>
-
-            <div id="previousOrderStatus"></div>
-
-            <p id="previousOrderInstructions"></p>
-
-            <div id="previousOrderDate"></div>
-
-            <div id="previousOrderDateWarning"></div>
-
-            <div id="previousOrderInputs"></div>
-
-            <button id="savePreviousOrderButton">
-                Save Previous Order
+            <button id="orderBreadButton">
+                Order Bread
             </button>
 
-            <button id="resetPreviousOrderButton">
-                Reset Previous Order
+            <button id="prepButton">
+                Prep
             </button>
 
         </div>
 
 
         <!-- ==========================================
-             PDF UPLOAD
+             ORDER BREAD WORKFLOW
              ========================================== -->
 
-        <div class="section">
+        <div id="orderBreadSection" style="display: none;">
 
-    <h2>Today's Production</h2>
+            <div class="section">
 
-    <input
-        type="file"
-        id="pdfFile"
-        accept=".pdf"
-    >
+                <h2>Order Bread</h2>
 
-    <br>
+                <p>
+                    Upload today's production PDF to calculate bread requirements.
+                </p>
 
-    <button id="analyzeButton">
-        Analyze PDF
-    </button>
-
-    <button
-        id="saveTodaysOrderButton"
-        disabled
-    >
-        Save Today's Order
-    </button>
-
-</div>
+            </div>
 
 
-        <div id="status"></div>
+            <!-- ==========================================
+                 CURRENT SUPPLY
+                 ========================================== -->
 
-        <div id="results"></div>
+            <div class="section">
+
+                <h2>Current Bread Supply</h2>
+
+                <p>
+                    Enter the number of packages you currently have.
+                </p>
+
+                <div id="inventoryInputs"></div>
+
+            </div>
+
+
+            <!-- ==========================================
+                 PREVIOUS ORDER
+                 ========================================== -->
+
+            <div class="section">
+
+                <h2>Previous Order</h2>
+
+                <div id="previousOrderStatus"></div>
+
+                <p id="previousOrderInstructions"></p>
+
+                <div id="previousOrderDate"></div>
+
+                <div id="previousOrderDateWarning"></div>
+
+                <div id="previousOrderInputs"></div>
+
+                <button id="savePreviousOrderButton">
+                    Save Previous Order
+                </button>
+
+                <button id="resetPreviousOrderButton">
+                    Reset Previous Order
+                </button>
+
+            </div>
+
+
+            <!-- ==========================================
+                 PDF UPLOAD
+                 ========================================== -->
+
+            <div class="section">
+
+                <h2>Today's Production</h2>
+
+                <input
+                    type="file"
+                    id="pdfFile"
+                    accept=".pdf"
+                >
+
+                <br>
+
+                <button id="analyzeButton">
+                    Analyze PDF
+                </button>
+
+                <button
+                    id="saveTodaysOrderButton"
+                    disabled
+                >
+                    Save Today's Order
+                </button>
+
+            </div>
+
+
+            <div id="status"></div>
+
+            <div id="results"></div>
+
+
+            <!-- BACK BUTTON -->
+
+            <div class="section">
+
+                <button id="backToMenuButton">
+                    ← Back
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================================
+             PREP WORKFLOW
+             ========================================== -->
+
+        <div id="prepSection" style="display: none;">
+
+            <div class="section">
+
+                <h2>Prep</h2>
+
+                <p>
+                    Prep tools will go here.
+                </p>
+
+                <!-- We will build the prep section next. -->
+
+            </div>
+
+
+            <div class="section">
+
+                <button id="backToMenuFromPrepButton">
+                    ← Back
+                </button>
+
+            </div>
+
+        </div>
 
     </div>
 

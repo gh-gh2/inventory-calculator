@@ -11,7 +11,24 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 // SETTINGS
 // ==========================================
 
-const UNITS_PER_PACKAGE = 6;
+// Number of sandwiches made per package of bread
+const SANDWICHES_PER_PACKAGE = {
+
+    "White": 9,
+
+    "Wheat": 9,
+
+    "Sprout": 6,
+
+    "Sourdough": 8,
+
+    "Honey": 8,
+
+    "Ciabatta": 12,
+
+    "Hoagie": 12
+};
+
 
 const BREAD_TYPES = [
     "White",
@@ -25,9 +42,34 @@ const BREAD_TYPES = [
 
 const STORAGE_KEY =
     "inventoryCalculatorPreviousOrder";
-    let lastCalculatedOrder = null;
 
+let lastCalculatedOrder = null;
 
+// ==========================================
+// POSSIBLE PRODUCTION LOCATIONS
+// ==========================================
+
+//const POSSIBLE_LOCATIONS = [
+
+//    "CMH",
+//    "CMO",
+//    "CMW",
+//    "CONC",
+//    "CONE",
+//    "CT",
+//    "F2G",
+//    "LC",
+//    "LEG",
+//    "MTC",
+//    "VEN",
+//    "CANN",
+//    "CE",
+//    "CFK",
+//    "PJ",
+//    "CHOICE",
+//    "HERITAGE"
+
+//];
 // ==========================================
 // BREAD RECIPES
 // ==========================================
@@ -36,55 +78,55 @@ const breadRecipes = {
 
     "Wedge White PB&J": {
         bread: "White",
-        units: 2,
+        units: 1,
         order: true
     },
 
     "Wedge Tuna Wheat": {
         bread: "Wheat",
-        units: 2,
+        units: 1,
         order: true
     },
 
     "Wedge Egg Wheat": {
         bread: "Wheat",
-        units: 2,
+        units: 1,
         order: true
     },
 
     "Sprout Vegetarian Pillow": {
         bread: "Sprout",
-        units: 2,
+        units: 1,
         order: true
     },
 
     "Sprout Turkey Cranberry Pillow": {
         bread: "Sprout",
-        units: 2,
+        units: 1,
         order: true
     },
 
     "Crunch": {
         bread: "Sprout",
-        units: 2,
+        units: 1,
         order: true
     },
 
     "Roast Beef on Sourdough": {
         bread: "Sourdough",
-        units: 2,
+        units: 1,
         order: true
     },
 
     "Sweet Heat": {
         bread: "Honey",
-        units: 2,
+        units: 1,
         order: true
     },
 
     "Pit Beef": {
         bread: "Honey",
-        units: 2,
+        units: 1,
         order: true
     },
 
@@ -94,11 +136,6 @@ const breadRecipes = {
         order: true
     },
 
-    "Ciabatta Ham and Cheese Pesto": {
-        bread: "Ciabatta",
-        units: 1,
-        order: true
-    },
 
     "Panini Italian": {
         bread: "Ciabatta",
@@ -141,12 +178,52 @@ const breadRecipes = {
         units: 1,
         order: true
     },
+    "Turkey Cranberry": {
+        bread: "Sprout",
+        units: 1,
+        order: true
+    },
+
+    "Ciabatta Turkey": {
+        bread: "Ciabatta",
+        units: 1,
+        order: true,
+        excludeCONE: true
+    },
+
+    "Panini Turkey Provolone": {
+        bread: "Ciabatta",
+        units: 1,
+        order: true
+    },
+
+    "Heritage Panini Ham & Cheese": {
+        bread: "Ciabatta",
+        units: 1,
+        order: true
+    },
+
+        "Ciabatta Ham and Cheese Pesto/ Concession S Only": {
+        bread: "Ciabatta",
+        units: 1,
+        order: true,
+        excludeCONE: true
+    },
 
 
-    // Reference only — NOT ordered yet
+    // ======================================
+    // REFERENCE ONLY — NOT ORDERED
+    // ======================================
 
-    "Challah Chicken Bacon Ranch Asiago": {
+
+    "Challah Turkey & Swiss": {
         bread: "Challah",
+        units: 1,
+        order: false
+    },
+
+    "Croissant Turkey/ Gouda": {
+        bread: "Croissant",
         units: 1,
         order: false
     },
@@ -156,6 +233,13 @@ const breadRecipes = {
         units: 1,
         order: false
     },
+
+    "Challah Chicken Bacon Ranch Asiago": {
+        bread: "Challah",
+        units: 1,
+        order: false
+    },
+
 
     "Challah Club": {
         bread: "Challah",
@@ -181,11 +265,6 @@ const breadRecipes = {
         order: false
     },
 
-    "Croissant Turkey/Gouda": {
-        bread: "Croissant",
-        units: 1,
-        order: false
-    },
 
     "Croissant Turkey/Swiss": {
         bread: "Croissant",
@@ -209,9 +288,21 @@ const breadRecipes = {
         bread: "Gluten Free",
         units: 1,
         order: false
-    }
-};
+    },
 
+    "Tortilla Club Wrap": {
+    bread: "Tortilla",
+    units: 1,
+    order: false
+    },
+
+    "Vending Turmeric Curry Garbanzo": {
+    bread: "Tortilla",
+    units: 1,
+    order: false
+    }
+
+};
 
 // ==========================================
 // CREATE INPUTS
@@ -887,7 +978,6 @@ async function readPDF(file) {
     return fullText;
 }
 
-
 // ==========================================
 // FIND PRODUCTS
 // ==========================================
@@ -896,9 +986,8 @@ function findProducts(pdfText) {
 
     const orders = {};
 
-    for (
-        const product in breadRecipes
-    ) {
+
+    for (const product in breadRecipes) {
 
         const escapedProduct =
             product.replace(
@@ -906,26 +995,53 @@ function findProducts(pdfText) {
                 "\\$&"
             );
 
+
+        /*
+         * Look for:
+         *
+         * PRODUCT NAME
+         * optional "1 each"
+         * EA
+         * QUANTITY
+         *
+         * Examples:
+         *
+         * Challah Chicken BBQ - 1 each EA 14
+         *
+         * Deli Ham & Cheddar EA 2,465
+         *
+         * Challah Club 1 each EA 460
+         */
+
+
         const pattern =
             new RegExp(
                 escapedProduct +
-                "\\s+(?:EA\\s+)?(\\d+(?:\\.\\d+)?)",
+                "(?:\\s*-?\\s*1\\s*each)?\\s+" +
+                "EA\\s+" +
+                "(\\d+(?:,\\d{3})*(?:\\.\\d+)?)",
                 "i"
             );
+
 
         const match =
             pdfText.match(
                 pattern
             );
 
+
         if (match) {
 
             orders[product] =
                 parseFloat(
-                    match[1]
+                    match[1].replace(
+                        /,/g,
+                        ""
+                    )
                 );
         }
     }
+
 
     return orders;
 }
@@ -1007,18 +1123,25 @@ function calculateFinalOrder(
 
     for (const bread of BREAD_TYPES) {
 
-        const unitsNeeded =
+        const sandwichesNeeded =
             breadTotals[bread] || 0;
 
 
-        // Convert PDF requirement
-        // from individual units
-        // into packages.
+        // Get the number of sandwiches
+        // that one package of this bread makes.
+
+        const sandwichesPerPackage =
+            SANDWICHES_PER_PACKAGE[bread];
+
+
+        // Calculate packages required.
+        // Math.ceil makes sure we always
+        // order a whole package.
 
         const requiredPackages =
             Math.ceil(
-                unitsNeeded /
-                UNITS_PER_PACKAGE
+                sandwichesNeeded /
+                sandwichesPerPackage
             );
 
 
@@ -1041,7 +1164,7 @@ function calculateFinalOrder(
         finalOrder[bread] = {
 
             unitsNeeded:
-                unitsNeeded,
+                sandwichesNeeded,
 
             requiredPackages:
                 requiredPackages,
@@ -1057,9 +1180,9 @@ function calculateFinalOrder(
         };
     }
 
+
     return finalOrder;
 }
-
 
 // ==========================================
 // DISPLAY RESULTS
@@ -1342,29 +1465,26 @@ document
 
             try {
 
-                const pdfText =
-                    await readPDF(
-                        file
-                    );
+                const pages =
+    await readPDF(
+        file
+    );
 
 
-                console.log(
-                    "PDF TEXT:"
-                );
-
-                console.log(
-                    pdfText
-                );
+console.log(
+    "PDF PAGES:",
+    pages
+);
 
 
-                status.textContent =
-                    "Finding products...";
+status.textContent =
+    "Finding products...";
 
 
-                const orders =
-                    findProducts(
-                        pdfText
-                    );
+const orders =
+    findProducts(
+        pages
+    );
 
 
                 console.log(
@@ -1401,5 +1521,90 @@ document
                 status.textContent =
                     "There was an error reading the PDF.";
             }
+        }
+    );
+
+    // ==========================================
+// START MENU
+// ==========================================
+
+const startMenu =
+    document.getElementById("startMenu");
+
+const orderBreadSection =
+    document.getElementById("orderBreadSection");
+
+const prepSection =
+    document.getElementById("prepSection");
+
+
+// ==========================================
+// ORDER BREAD BUTTON
+// ==========================================
+
+document
+    .getElementById("orderBreadButton")
+    .addEventListener(
+        "click",
+        function () {
+
+            startMenu.style.display = "none";
+
+            orderBreadSection.style.display = "block";
+
+        }
+    );
+
+
+// ==========================================
+// PREP BUTTON
+// ==========================================
+
+document
+    .getElementById("prepButton")
+    .addEventListener(
+        "click",
+        function () {
+
+            startMenu.style.display = "none";
+
+            prepSection.style.display = "block";
+
+        }
+    );
+
+
+// ==========================================
+// BACK TO MENU — ORDER BREAD
+// ==========================================
+
+document
+    .getElementById("backToMenuButton")
+    .addEventListener(
+        "click",
+        function () {
+
+            orderBreadSection.style.display = "none";
+
+            startMenu.style.display = "block";
+
+        }
+    );
+
+
+// ==========================================
+// BACK TO MENU — PREP
+// ==========================================
+
+document
+    .getElementById("backToMenuFromPrepButton")
+    .addEventListener(
+        "click",
+        function () {
+
+            prepSection.style.display = "none";
+
+            startMenu.style.display = "block";
+
         }
     );

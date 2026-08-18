@@ -154,42 +154,202 @@
         </div>
 
 
-        <!-- ==========================================
-             PREP WORKFLOW
-             ========================================== -->
+       <!-- ==========================================
+     PREP WORKFLOW
+     ========================================== -->
 
-        <div id="prepSection" style="display: none;">
+<div id="prepSection" style="display: none;">
 
-            <div class="section">
+    <div class="section">
 
-                <h2>Prep</h2>
+        <h2>Prep</h2>
 
-                <p>
-                    Prep tools will go here.
-                </p>
+        <p>
+            Upload today's production PDF to begin prep.
+        </p>
 
-                <!-- We will build the prep section next. -->
+        <input
+            type="file"
+            id="prepPdfFile"
+            accept=".pdf"
+        >
 
-            </div>
+        <br>
 
-
-            <div class="section">
-
-                <button id="backToMenuFromPrepButton">
-                    ← Back
-                </button>
-
-            </div>
-
-        </div>
+        <div id="prepStatus"></div>
 
     </div>
 
 
+    <!-- ==========================================
+         PREP CATEGORIES
+         ========================================== -->
+
+    <div
+        id="prepCategories"
+        class="section"
+        style="display: none;"
+    >
+
+        <h2>Prep Categories</h2>
+
+
+        <!-- ======================================
+             SANDWICHES
+             ====================================== -->
+
+        <details class="prep-category">
+
+            <summary>
+                Sandwiches
+            </summary>
+
+
+            <div class="prep-subsection">
+
+                <details>
+
+                    <summary>
+                        Types
+                    </summary>
+
+                    <div id="sandwichTypes">
+                    </div>
+
+                </details>
+
+
+                <details>
+
+                    <summary>
+                        Ingredients
+                    </summary>
+
+                    <div id="sandwichIngredients">
+                    </div>
+
+                </details>
+
+            </div>
+
+        </details>
+
+
+        <!-- ======================================
+             SALADS
+             ====================================== -->
+
+        <details class="prep-category">
+
+            <summary>
+                Salads
+            </summary>
+
+
+            <div class="prep-subsection">
+
+                <details>
+
+                    <summary>
+                        Types
+                    </summary>
+
+                    <div id="saladTypes">
+                    </div>
+
+                </details>
+
+
+                <details>
+
+                    <summary>
+                        Ingredients
+                    </summary>
+
+                    <div id="saladIngredients">
+                    </div>
+
+                </details>
+
+            </div>
+
+        </details>
+
+
+        <!-- ======================================
+             COMPOUNDS
+             ====================================== -->
+
+        <details class="prep-category">
+
+            <summary>
+                Compounds
+            </summary>
+
+
+            <div class="prep-subsection">
+
+                <details>
+
+                    <summary>
+                        Types
+                    </summary>
+
+                    <div id="compoundTypes">
+                    </div>
+
+                </details>
+
+
+                <details>
+
+                    <summary>
+                        Ingredients
+                    </summary>
+
+                    <div id="compoundIngredients">
+                    </div>
+
+                </details>
+
+            </div>
+
+        </details>
+        <!-- ======================================
+     NEW ITEMS
+     ====================================== -->
+
+<div id="newPrepItems">
+</div>
+
+        <!-- ======================================
+             PRINT
+             ====================================== -->
+
+        <button id="printPrepButton">
+            Print Prep Sheet
+        </button>
+
+    </div>
+
+
+    <!-- BACK BUTTON -->
+
+    <div class="section">
+
+        <button id="backToMenuFromPrepButton">
+            ← Back
+        </button>
+
+    </div>
+
+</div>
+
+
     <script
-        type="module"
-        src="script.js">
-    </script>
+    type="module"
+    src="js/main.js">
+</script>
 
 </body>
 </html>

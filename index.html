@@ -6,39 +6,919 @@
 
     <title>Inventory Calculator</title>
 
-    <link rel="stylesheet" href="style.css">
+    <style>
+/* ==========================================
+   GENERAL PAGE
+   ========================================== */
 
-    <!-- PDF.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs"
-        type="module"></script>
+:root {
+    --ink: #233047;
+    --muted: #68758a;
+    --cream: #fffaf2;
+    --paper: #ffffff;
+    --line: #e6e8ed;
+    --navy: #19324d;
+    --blue: #2f6f9f;
+    --blue-soft: #eaf4fb;
+    --gold: #d99a2b;
+    --gold-soft: #fff4db;
+    --green: #3f8060;
+    --green-soft: #edf8f1;
+    --shadow: 0 18px 45px rgba(34, 48, 70, 0.11);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at 8% 0%, #fff2cf 0, transparent 30%),
+        linear-gradient(135deg, #f7f9fc 0%, #eef4f7 100%);
+    margin: 0;
+    padding: 32px 20px 64px;
+}
+
+.container {
+    max-width: 1080px;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.94);
+    padding: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 4px 4px 28px;
+}
+
+.brand-mark {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: linear-gradient(145deg, #fff0c8, #f7c96d);
+    font-size: 34px;
+    box-shadow: 0 8px 18px rgba(217, 154, 43, 0.2);
+}
+
+.eyebrow {
+    margin: 0 0 6px;
+    color: var(--blue);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+h1,
+h2,
+h3 {
+    color: var(--ink);
+}
+
+h1 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: -0.04em;
+}
+
+h2 {
+    margin-top: 0;
+    font-size: 1.35rem;
+    letter-spacing: -0.02em;
+}
+
+.app-tagline {
+    margin: 8px 0 0;
+    color: var(--muted);
+    max-width: 680px;
+}
+
+.section {
+    margin-top: 22px;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--paper);
+    box-shadow: 0 5px 18px rgba(35, 48, 71, 0.045);
+}
+
+.section > p {
+    color: var(--muted);
+    line-height: 1.55;
+}
+
+.welcome-section {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 240px;
+    align-items: center;
+    gap: 24px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #fffdf8 0%, #f3f8fb 100%);
+}
+
+.welcome-section h2 {
+    margin-bottom: 8px;
+    font-size: 1.8rem;
+}
+
+.welcome-copy > p:not(.eyebrow) {
+    max-width: 580px;
+}
+
+.menu-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.product-visual {
+    position: relative;
+    min-height: 190px;
+    border-radius: 22px;
+    background: linear-gradient(150deg, #173a56, #2e6e7e);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.product-badge {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #fffdf8;
+    box-shadow: 0 10px 20px rgba(14, 34, 48, 0.2);
+}
+
+.product-badge-large {
+    width: 102px;
+    height: 102px;
+    left: 64px;
+    top: 45px;
+    font-size: 48px;
+}
+
+.product-badge-top {
+    width: 58px;
+    height: 58px;
+    right: 24px;
+    top: 18px;
+    font-size: 28px;
+}
+
+.product-badge-bottom {
+    width: 62px;
+    height: 62px;
+    left: 18px;
+    bottom: 18px;
+    font-size: 30px;
+}
+
+.product-badge-note {
+    width: 42px;
+    height: 42px;
+    right: 26px;
+    bottom: 22px;
+    color: var(--green);
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.bread-order-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 25px;
+}
+
+.bread-order-columns > .section:first-child {
+    border-top: 4px solid var(--gold);
+}
+
+.bread-order-columns > .section:last-child {
+    border-top: 4px solid var(--blue);
+    background: linear-gradient(180deg, #fbfdff, #ffffff);
+}
+
+#todayPdfControls {
+    margin-top: 15px;
+}
+
+#todayPdfControls label {
+    margin-right: 15px;
+}
+
+.today-production-dropdown {
+    margin-top: 12px;
+    border: 1px solid #d7e1e8;
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: #f7fbfd;
+}
+
+.today-production-dropdown summary {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 5px;
+    color: var(--navy);
+}
+
+.today-production-dropdown table {
+    margin-top: 8px;
+}
+
+.today-production-dropdown button {
+    margin-top: 0;
+    padding: 5px 10px;
+}
+
+@media (max-width: 700px) {
+    body {
+        padding: 14px 10px 40px;
+    }
+
+    .container {
+        padding: 20px 14px;
+        border-radius: 18px;
+    }
+
+    .app-header {
+        align-items: flex-start;
+    }
+
+    .brand-mark {
+        width: 50px;
+        height: 50px;
+        border-radius: 15px;
+        font-size: 27px;
+    }
+
+    .welcome-section {
+        grid-template-columns: 1fr;
+    }
+
+    .product-visual {
+        min-height: 130px;
+    }
+
+    .product-badge-large {
+        left: calc(50% - 51px);
+        top: 14px;
+    }
+
+    .product-badge-top {
+        right: 18%;
+        top: 10px;
+    }
+
+    .product-badge-bottom {
+        left: 18%;
+        bottom: 10px;
+    }
+
+    .product-badge-note {
+        right: 18%;
+        bottom: 12px;
+    }
+
+    .bread-order-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+button {
+    margin-top: 15px;
+    margin-right: 10px;
+    padding: 11px 18px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    color: white;
+    background: var(--navy);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 7px 14px rgba(25, 50, 77, 0.18);
+    background: #284d70;
+}
+
+.primary-action {
+    background: var(--gold);
+    color: #2d2515;
+}
+
+.primary-action:hover:not(:disabled) {
+    background: #e6aa3c;
+}
+
+.secondary-action {
+    background: var(--green);
+}
+
+.secondary-action:hover:not(:disabled) {
+    background: #347052;
+}
+
+.danger-action {
+    background: #fff5f3;
+    border-color: #e5aaa1;
+    color: #9b3e34;
+}
+
+.danger-action:hover:not(:disabled) {
+    background: #ffe8e4;
+    color: #7f2d25;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* ==========================================
+   STATUS
+   ========================================== */
+
+#status {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+#status,
+#todayStatus,
+#prepStatus {
+    color: var(--blue);
+}
+
+#results {
+    margin-top: 30px;
+}
+
+
+/* ==========================================
+   BREAD INVENTORY
+   ========================================== */
+
+.bread-input-row {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+}
+
+.bread-input-row label {
+    width: 150px;
+    font-weight: bold;
+}
+
+.bread-input-row input {
+    width: 100px;
+    padding: 7px;
+    font-size: 16px;
+}
+
+input[type="file"] {
+    width: 100%;
+    max-width: 520px;
+    padding: 11px;
+    border: 1px dashed #aebdca;
+    border-radius: 10px;
+    background: #f8fbfd;
+    color: var(--muted);
+}
+
+input[type="number"],
+select {
+    border: 1px solid #c9d2dc;
+    border-radius: 8px;
+    background: white;
+    color: var(--ink);
+}
+
+input:focus,
+select:focus,
+button:focus-visible,
+summary:focus-visible {
+    outline: 3px solid rgba(47, 111, 159, 0.25);
+    outline-offset: 2px;
+}
+
+.saved-status {
+    color: green;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.missing-status {
+    color: #b36b00;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.order-date {
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.date-warning {
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 6px;
+    background-color: #fff3cd;
+    border: 1px solid #ffe69c;
+    color: #664d03;
+}
+
+.date-ok {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    background-color: #d1e7dd;
+    border: 1px solid #a3cfbb;
+    color: #0f5132;
+}
+
+
+/* ==========================================
+   TABLES
+   ========================================== */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background: #edf3f7;
+    color: var(--navy);
+    font-size: 0.82rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+
+/* ==========================================
+   CALCULATION DETAILS
+   ========================================== */
+
+.calculation-details {
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.calculation-details summary {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 5px;
+}
+
+.calculation-details table {
+    margin-top: 15px;
+}
+
+.special-order-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.special-order-controls input {
+    width: 80px;
+    padding: 8px;
+    font-size: 16px;
+}
+
+[data-sandwich-action] {
+    margin-top: 0;
+    padding: 5px 10px;
+}
+
+
+/* ==========================================
+   SELECT
+   ========================================== */
+
+select {
+    padding: 8px;
+    font-size: 16px;
+    min-width: 250px;
+}
+
+
+/* ==========================================
+   PREP CALCULATOR
+   ========================================== */
+
+.prep-category {
+    margin-top: 15px;
+    border: 1px solid #dce4ea;
+    border-radius: 12px;
+    padding: 10px 14px;
+    background: #fbfcfd;
+}
+
+.prep-category > summary {
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 8px;
+    color: var(--navy);
+}
+
+.prep-category:nth-of-type(1) > summary::before {
+    content: "ðŸ¥ª";
+    margin-right: 10px;
+}
+
+.prep-category:nth-of-type(2) > summary::before {
+    content: "ðŸ¥—";
+    margin-right: 10px;
+}
+
+.prep-category:nth-of-type(3) > summary::before {
+    content: "ðŸ§º";
+    margin-right: 10px;
+}
+
+.prep-subsection {
+    margin-top: 10px;
+    padding-left: 15px;
+}
+
+.prep-subsection details {
+    margin-top: 10px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+.prep-subsection summary {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 6px;
+}
+
+.prep-list {
+    margin-top: 10px;
+}
+
+
+/* ==========================================
+   PREP ROWS
+   ========================================== */
+
+.prep-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.prep-row:last-child {
+    border-bottom: none;
+}
+
+.prep-name {
+    font-weight: bold;
+}
+
+.prep-quantity {
+    margin-left: 20px;
+}
+
+.prep-total {
+    margin-top: 20px;
+    padding: 12px;
+    border: 1px solid #b9d8c5;
+    border-radius: 10px;
+    background: var(--green-soft);
+    color: #23583b;
+    font-weight: bold;
+    text-align: center;
+}
+
+
+/* ==========================================
+   PRINT PREP SHEET
+   ========================================== */
+
+#prepPrintSheet {
+    display: none;
+}
+
+
+@media print {
+
+    @page {
+        size: Letter portrait;
+        margin: 0.25in;
+    }
+
+
+    /* ======================================
+       HIDE NORMAL WEBSITE
+       ====================================== */
+
+    body * {
+        visibility: hidden;
+    }
+
+
+    #prepPrintSheet,
+    #prepPrintSheet * {
+        visibility: visible;
+    }
+
+
+    #prepPrintSheet {
+
+        display: block !important;
+
+        position: absolute;
+
+        left: 0;
+        top: 0;
+
+        width: 100%;
+
+        margin: 0;
+        padding: 0;
+    }
+
+
+    /* ======================================
+       EACH PRINT PAGE
+       ====================================== */
+
+    .prep-print-page {
+
+        width: 100%;
+
+        height: 10.2in;
+
+        margin: 0;
+        padding: 0;
+
+        box-sizing: border-box;
+    }
+
+
+    /* ======================================
+       SANDWICH PAGE
+       ====================================== */
+
+    .prep-print-page:first-child {
+
+        page-break-after: always;
+
+        break-after: page;
+    }
+
+
+    /* ======================================
+       HEADINGS
+       ====================================== */
+
+    .prep-print-page h1 {
+
+        font-size: 18px;
+
+        margin: 0 0 8px 0;
+
+        padding: 0 0 5px 0;
+
+        border-bottom: 2px solid #000;
+    }
+
+    .prep-tray-summary {
+        margin: 0 0 10px;
+        font-size: 14px;
+    }
+
+    .prep-tray-summary h2 {
+        margin: 0 0 4px;
+        font-size: 15px;
+    }
+
+    .prep-tray-summary ul {
+        display: flex;
+        gap: 18px;
+        margin: 0;
+        padding-left: 18px;
+    }
+
+
+    /* ======================================
+       PRINT TABLE
+       ====================================== */
+
+    .prep-print-table {
+
+        width: 100%;
+
+        border-collapse: collapse;
+
+        table-layout: fixed;
+
+        margin: 0;
+    }
+
+
+    /* ======================================
+       FOUR COLUMNS
+
+       1 = Sandwich
+       2 = Total
+       3 = Sandwich
+       4 = Total
+       ====================================== */
+
+    .prep-print-table th:nth-child(1),
+    .prep-print-table td:nth-child(1) {
+
+        width: 40%;
+    }
+
+
+    .prep-print-table th:nth-child(2),
+    .prep-print-table td:nth-child(2) {
+
+        width: 10%;
+    }
+
+
+    .prep-print-table th:nth-child(3),
+    .prep-print-table td:nth-child(3) {
+
+        width: 40%;
+    }
+
+
+    .prep-print-table th:nth-child(4),
+    .prep-print-table td:nth-child(4) {
+
+        width: 10%;
+    }
+
+
+    /* ======================================
+       HEADER
+       ====================================== */
+
+    .prep-print-table th {
+
+        background: #eee;
+
+        border: 1px solid #999;
+
+        padding: 3px 5px;
+
+        font-size: 15px;
+
+        text-align: left;
+    }
+
+
+    /* ======================================
+       ROWS
+       ====================================== */
+
+    .prep-print-table td {
+
+        border: 1px solid #ccc;
+
+        padding: 2px 5px;
+
+        height: 0.27in;
+
+        font-size: 25px;
+
+        line-height: 1;
+
+        vertical-align: middle;
+
+        box-sizing: border-box;
+    }
+
+
+    /* ======================================
+       TOTAL COLUMNS
+       ====================================== */
+
+    .prep-print-table .print-total {
+
+        text-align: right;
+
+        font-weight: bold;
+
+        white-space: nowrap;
+    }
+
+
+    /* ======================================
+       KEEP ROWS TOGETHER
+       ====================================== */
+
+    .prep-print-table tr {
+
+        break-inside: avoid;
+
+        page-break-inside: avoid;
+    }
+
+
+    /* ======================================
+       SALAD PAGE
+       ====================================== */
+
+    .prep-print-salad-page {
+
+        page-break-before: always;
+
+        break-before: page;
+    }
+
+    .prep-print-compound-page {
+
+        page-break-before: always;
+
+        break-before: page;
+    }
+
+}
+
+
+</style>
 </head>
 
 <body>
 
     <div class="container">
 
-        <h1>Inventory Calculator</h1>
+        <header class="app-header">
+            <div class="brand-mark" aria-hidden="true">ðŸž</div>
+            <div>
+                <p class="eyebrow">Kitchen production planner</p>
+                <h1>Inventory Calculator</h1>
+                <p class="app-tagline">Turn production forms into a clear plan for bread, sandwiches, salads, and prep.</p>
+            </div>
+        </header>
 
 
         <!-- ==========================================
              START MENU
              ========================================== -->
 
-        <div id="startMenu" class="section">
+        <div id="startMenu" class="section welcome-section">
 
-            <h2>What are you doing today?</h2>
+            <div class="welcome-copy">
+                <p class="eyebrow">Start here</p>
+                <h2>What are you doing today?</h2>
 
-            <p>
-                Choose what you would like to work on.
-            </p>
+                <p>
+                    Choose a workflow to organize todayâ€™s production and tomorrowâ€™s order.
+                </p>
 
-            <button id="orderBreadButton">
-                Order Bread
-            </button>
+                <div class="menu-actions">
+                    <button id="orderBreadButton" class="primary-action">
+                        <span aria-hidden="true">ðŸž</span> Order Bread
+                    </button>
 
-            <button id="prepButton">
-                Prep
-            </button>
+                    <button id="prepButton" class="secondary-action">
+                        <span aria-hidden="true">ðŸ¥—</span> Prep
+                    </button>
+                </div>
+            </div>
+
+            <div class="product-visual" aria-label="Bread, sandwich, salad, and production checklist icons">
+                <span class="product-badge product-badge-large">ðŸ¥ª</span>
+                <span class="product-badge product-badge-top">ðŸ¥–</span>
+                <span class="product-badge product-badge-bottom">ðŸ¥—</span>
+                <span class="product-badge product-badge-note">âœ“</span>
+            </div>
 
         </div>
 
@@ -51,39 +931,55 @@
 
             <div class="section">
 
-                <h2>Order Bread</h2>
+                <h2>Do you still have sandwiches to make today?</h2>
 
                 <p>
-                    Upload today's production PDF to calculate bread requirements.
+                    If yes, upload today's form and enter the sandwiches that are still unfinished.
+                    The remaining production will be reserved from the current bread supply.
                 </p>
+
+                <label>
+                    <input type="radio" name="todayProductionChoice" value="yes" checked>
+                    Yes
+                </label>
+
+                <label>
+                    <input type="radio" name="todayProductionChoice" value="no">
+                    No
+                </label>
+
+                <div id="todayPdfControls">
+                    <input type="file" id="todayPdfFile" accept=".pdf">
+                    <button id="analyzeTodayButton" type="button">Analyze Today's PDF</button>
+                    <div id="todayStatus" role="status"></div>
+                </div>
 
             </div>
 
 
-            <!-- ==========================================
-                 CURRENT SUPPLY
-                 ========================================== -->
+            <div class="bread-order-columns">
 
-            <div class="section">
+                <div class="section">
+                    <h2>Current Bread Supply</h2>
+                    <p>Enter the number of packages you currently have.</p>
+                    <div id="inventoryInputs"></div>
+                </div>
 
-                <h2>Current Bread Supply</h2>
-
-                <p>
-                    Enter the number of packages you currently have.
-                </p>
-
-                <div id="inventoryInputs"></div>
+                <div
+                    id="todayBreadProduction"
+                    class="section"
+                >
+                    <h2>Today's Bread Production</h2>
+                    <p>Today's unfinished sandwiches will be reserved from the supply on the left.</p>
+                    <p>No today's production has been loaded.</p>
+                </div>
 
             </div>
 
 
-            <!-- ==========================================
-                 PREVIOUS ORDER
-                 ========================================== -->
-
             <div class="section">
 
-                <h2>Previous Order</h2>
+                <h2>Last Saved Order</h2>
 
                 <div id="previousOrderStatus"></div>
 
@@ -95,50 +991,44 @@
 
                 <div id="previousOrderInputs"></div>
 
-                <button id="savePreviousOrderButton">
-                    Save Previous Order
-                </button>
-
-                <button id="resetPreviousOrderButton">
-                    Reset Previous Order
-                </button>
+                <button id="savePreviousOrderButton">Save Previous Order</button>
+                <button id="resetPreviousOrderButton">Reset Previous Order</button>
 
             </div>
-
-
-            <!-- ==========================================
-                 PDF UPLOAD
-                 ========================================== -->
 
             <div class="section">
 
-                <h2>Today's Production</h2>
+                <h2>Tomorrow's Bread Production</h2>
 
-                <input
-                    type="file"
-                    id="pdfFile"
-                    accept=".pdf"
-                >
+                <p>Upload tomorrow's production form, then update sandwich quantities if necessary.</p>
 
-                <br>
-
-                <button id="analyzeButton">
-                    Analyze PDF
-                </button>
-
-                <button
-                    id="saveTodaysOrderButton"
-                    disabled
-                >
-                    Save Today's Order
-                </button>
+                <input type="file" id="tomorrowPdfFile" accept=".pdf">
+                <button id="analyzeButton" type="button">Analyze Tomorrow's PDF</button>
+                <div id="status" role="status"></div>
 
             </div>
 
+            <div
+                id="tomorrowSandwichAdjustments"
+                class="section"
+                style="display: none;"
+            ></div>
 
-            <div id="status"></div>
+            <div class="section">
+                <button id="getBreadOrderButton" type="button">Get Bread Order</button>
+                <div id="results"></div>
+            </div>
 
-            <div id="results"></div>
+            <div class="section">
+                <h2>Confirm and Order Bread</h2>
+                <p>Review the bread order above before saving it as the new saved order.</p>
+                <button id="saveTodaysOrderButton" disabled>
+                    Confirm and Order Bread
+                </button>
+                <button id="clearBreadCalculationButton" type="button" class="danger-action">
+                    Clear Current Calculation
+                </button>
+            </div>
 
 
             <!-- BACK BUTTON -->
@@ -146,7 +1036,7 @@
             <div class="section">
 
                 <button id="backToMenuButton">
-                    ← Back
+                    â† Back
                 </button>
 
             </div>
@@ -330,6 +1220,12 @@
             Print Prep Sheet
         </button>
 
+        <div id="prepUniqueItemTotal" class="prep-total"></div>
+
+        <button id="clearPrepCalculationButton" type="button" class="danger-action">
+            Clear Current Prep Calculation
+        </button>
+
     </div>
 
 
@@ -338,7 +1234,7 @@
     <div class="section">
 
         <button id="backToMenuFromPrepButton">
-            ← Back
+            â† Back
         </button>
 
     </div>
@@ -346,10 +1242,5480 @@
 </div>
 
 
-    <script
-    type="module"
-    src="main.js">
+    <script type="module">
+import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+
+async function readPDF(file) {
+    if (!file) {
+        throw new Error("A PDF file is required.");
+    }
+
+    const pdf = await pdfjsLib.getDocument({
+        data: await file.arrayBuffer()
+    }).promise;
+
+    const pages = [];
+
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+        const page = await pdf.getPage(pageNumber);
+        const textContent = await page.getTextContent();
+        pages.push(textContent.items.map(item => item.str).join(" "));
+    }
+
+    // Preserve page boundaries. The production report uses
+    // separate Totals and location-only pages, so callers can
+    // tell the first-occurrence table from its continuations.
+    return pages.join("\n__PDF_PAGE_BREAK__\n");
+}
+
+
+
+// ==========================================
+// PRODUCT ALIASES
+// ==========================================
+//
+// The name used by the calculator does not
+// always exactly match the name in the PDF.
+// ==========================================
+
+const productAliases = {
+
+    // ==========================================
+    // SANDWICHES
+    // ==========================================
+
+    "Challah Turkey & Swiss": [
+        "Challah Turkey & Swiss",
+        "Challah Turkey and Swiss",
+        "Challah Turkey/Swiss"
+    ],
+
+    "Challah Chicken and Arugula": [
+        "Challah Chicken and Arugula",
+        "Challah Chicken & Arugula"
+    ],
+
+    "Panini Turkey Sausage Egg Cheese": [
+        "Panini Turkey Sausage Egg Cheese",
+        "Panini Turkey Sausage Egg Cheese 1 each"
+    ],
+
+    "Chicken Salad Kaiser": [
+        "Chicken Salad Kaiser",
+        "Chicken Salad Kaiser (Not Available)"
+    ],
+
+    "Ciabatta Turkey": [
+        "Ciabatta Turkey",
+        "CIABATTA Turkey - 1 each (Not Available)"
+    ],
+
+    "Vending Turmeric Curry Garbanzo": [
+        "Vending Turmeric Curry Garbanzo",
+        "Turmeric Curry Garbanzo",
+        "Turmeric Curry",
+        "WRAP Vending Turmeric Curry Garbanzo"
+    ],
+    
+
+
+    // ==========================================
+    // SALADS
+    // ==========================================
+
+    "Mediterranean (LG)": [
+        "Mediterranean (LG)",
+        "Mediterranean",
+        "Mediterrane an (LG)",
+        "Mediterrane an"
+    ],
+
+    "Sweet Potato and Chicken Green Salad (LG) (Not Available)": [
+        "Sweet Potato and Chicken Green Salad (LG) (Not Available)",
+        "Sweet Potato and Chicken Green Salad (LG)"
+    ],
+
+
+    // ==========================================
+    // COMPOUNDS
+    // ==========================================
+
+    "8oz Strawberry": [
+        "8oz Strawberry",
+        "Strawberry C 8"
+    ],
+
+    "8oz Orange Peach@": [
+        "8oz Orange Peach@",
+        "8oz Orange Peach"
+    ],
+
+    "Strawberry Salad (S)": [
+        "Strawberry Salad (S)"
+    ],
+
+    "Broccoli/Slaw Craisin 8oz": [
+        "Broccoli/Slaw Craisin 8oz",
+        "Broccoli/Slaw Craisin",
+        "Broccoli Slaw Craisin 8oz"
+    ],
+
+    "Bean Dip": [
+        "Bean Dip",
+        "Bean 16 oz",
+        "Bean",
+        "Bean 16 oz (Wed. & Fri Delivery)",
+        "DIP Bean 16 oz",
+        "DIP Bean 16 oz (Wed. & Fri Delivery)"
+    ],
+
+    "Filling Tuna": [
+        "Filling Tuna",
+        "Filling Tuna 2 for Sat",
+        "Filling Tuna (2 for Sat)"
+    ],
+
+    "Caprese 8 oz": [
+        "Caprese 8 oz",
+        "Caprese 8oz",
+        "Caprese C 8"
+    ],
+
+
+    // ==========================================
+    // LARGE TAKEOUT COMPOUNDS
+    // ==========================================
+
+    "Deli Pasta 7.5 lb Bowl Take Out": [
+        "Deli Pasta 7.5 lb Bowl Take Out",
+        "Deli Pasta 7.5 Bowl Take Out",
+        "Deli Pasta 7.5 lb Bowl Take Out@"
+    ],
+
+    "Broccoli/Kale Slaw 5 lb Bowl Take Out": [
+        "Broccoli/Kale Slaw 5 lb Bowl Take Out",
+        "Broccoli/Kale Slaw 5 Bowl Take Out",
+        "Broccoli/Kale Slaw 5 lb Bowl Take Out@",
+        "Broccoli Kale Slaw 5 Bowl Take Out"
+    ],
+
+
+    // ==========================================
+    // OTHER COMPOUNDS
+    // ==========================================
+
+    "BUTTER Honey 1 #": [
+        "BUTTER Honey",
+        "Butter Honey 1 #"
+    ],
+
+    "Wild Berry Cream Cheese": [
+        "Wild Berry Cream Cheese"
+    ],
+
+    "Plain Cream Cheese": [
+        "Plain Cream Cheese",
+        "Cream Cheese Plain"
+    ],
+
+    "Cream Cheese Plain 30 lbs Container": [
+        "Cream Cheese Plain 30 lbs Container"
+    ],
+
+    "Onion and Chives Cream Cheese": [
+        "Onion and Chives Cream Cheese"
+    ],
+
+    "Strawberry Cream Cheese": [
+        "Strawberry Cream Cheese"
+    ],
+
+    "Honey Nut Cream Cheese": [
+        "Honey Nut Cream Cheese"
+    ],
+
+    "TOMATO Sliced": [
+        "TOMATO Sliced",
+        'TOMATO Sliced 1/4"',
+        'TOMATO Sliced 1/4" (For Food to Go)',
+        "TOMATO Sliced 1/4 (For Food to Go)",
+        'TOMATO Sliced 1/4" (For Food to Go)@',
+        "TOMATO Sliced 1/4 (For Food to Go)@"
+    ],
+
+    "DELI HAM Parkerhouse 16 slices/lb": [
+        "DELI HAM Parkerhouse 16 slices/lb",
+        "DELI HAM Parkerhouse 16 slices",
+        "DELI HAM Parkerhouse 16 slices/13",
+        "HAM Parkerhouse 16 slices/lb"
+    ],
+
+    "DELI TURKEY Parkerhouse 16 slices": [
+        "DELI TURKEY Parkerhouse 16 slices",
+        "DELI TURKEY Parkerhouse 16 slices/3"
+    ],
+
+    "CUP PARFAIT Berry w/ Granola 12 oz Package": [
+        "CUP PARFAIT Berry w/ Granola 12 oz Package",
+        "CUP PARFAIT Berry w Granola 12 oz Package",
+        "PARFAIT Berry w/ Granola 12 oz Package"
+    ],
+
+    "Berry w/ Granola 12 oz Package": [
+        "Berry w/ Granola 12 oz Package",
+        "CUP PARFAIT Berry w/ Granola 12 oz Package",
+        "CUP PARFAIT Berry w Granola 12 oz Package",
+        "PARFAIT Berry w/ Granola 12 oz Package",
+        "Berry 12 oz Package",
+        "Berry 12oz Package"
+    ],
+
+    "Ranch 2 fl. oz Package": [
+        "Ranch 2 fl. oz Package",
+        "CUP DIP Ranch 2 fl. oz Package"
+    ],
+
+    "Berry 9oz Package": [
+        "Berry 9oz Package",
+        "Berry 9 oz Package",
+        "CUP PARFAIT Berry 9oz Package"
+    ],
+
+    "Provolone Sliced Bulk/ lbs": [
+        "Provolone Sliced Bulk/ lbs",
+        "CHEESE Provolone Sliced Bulk/ lbs"
+    ],
+
+    "Relish Tray Small Take out": [
+        "Relish Tray Small Take out",
+        "TO RELISH TRAY Small Take out@"
+    ],
+
+    "Relish Tray Medium Takeout": [
+        "Relish Tray Medium Takeout",
+        "TO RELISH TRAY MEDIUM TAKEOUT@"
+    ],
+
+    "Relish Tray Large Takeout": [
+        "Relish Tray Large Takeout",
+        "TO RELISH TRAY LARGE TAKEOUT@"
+    ],
+
+    "Retail Cheese Tray Large Cube Take Out": [
+        "Retail Cheese Tray Large Cube Take Out",
+        "RETAIL CHEESE TRAY Large Cube Take Out"
+    ],
+
+    "Coleslaw 5.5lb Bowl Take Out": [
+        "Coleslaw 5.5lb Bowl Take Out",
+        "SALAD Coleslaw 5.5lb Bowl Take Out@"
+    ],
+
+    "Mediterranean Small": [
+        "Mediterranean Small",
+        "Mediterrane an Small"
+    ]
+
+};
+
+
+
+// ==========================================
+// FIND PRODUCTS
+// ==========================================
+
+function findProducts(
+    pdfText,
+    productRecipes
+) {
+
+    const orders = {};
+
+
+    if (
+        !productRecipes ||
+        typeof productRecipes !== "object"
+    ) {
+
+        throw new Error(
+            "productRecipes must be an object."
+        );
+    }
+
+
+    const productionDays =
+        getProductionDays(
+            pdfText
+        );
+
+
+    for (
+        const product of Object.keys(productRecipes)
+    ) {
+
+        const recipe =
+            productRecipes[product];
+
+
+        if (!recipe) {
+            continue;
+        }
+
+
+        const total =
+            findProductTotal(
+                pdfText,
+                product
+            );
+
+
+        if (total === null) {
+            continue;
+        }
+
+
+        // ==========================================
+        // PRODUCTS THAT EXCLUDE CONE
+        // ==========================================
+
+        if (recipe.excludeCONE) {
+
+            const conePerDay = 2;
+
+            const totalCONE =
+                conePerDay *
+                productionDays;
+
+
+            const ourQuantity =
+                Math.max(
+                    0,
+                    total - totalCONE
+                );
+
+
+            orders[product] =
+                ourQuantity;
+
+        } else {
+
+            orders[product] =
+                total;
+        }
+    }
+
+    return orders;
+}
+
+
+
+// ==========================================
+// FIND PRODUCT TOTAL
+// ==========================================
+
+function findProductTotal(
+    pdfText,
+    product
+) {
+
+    let searchTerms = [
+        product
+    ];
+
+
+    if (
+        productAliases[product]
+    ) {
+
+        searchTerms = [
+            ...productAliases[product]
+        ];
+    }
+
+
+    for (
+        const searchTerm of searchTerms
+    ) {
+
+        const total =
+            findProductTotalUsingName(
+                pdfText,
+                searchTerm
+            );
+
+
+        if (
+            total !== null
+        ) {
+
+            return total;
+        }
+    }
+
+
+    return null;
+}
+
+
+
+// ==========================================
+// FIND PRODUCT USING NAME
+// ==========================================
+
+function findProductTotalUsingName(
+    pdfText,
+    product
+) {
+
+    const normalizedText =
+        normalizePdfText(
+            pdfText
+        );
+
+
+    const normalizedProduct =
+        normalizePdfText(
+            product
+        );
+
+
+    const normalTotal =
+        findUsingNormalizedText(
+            normalizedText,
+            normalizedProduct
+        );
+
+
+    if (
+        normalTotal !== null
+    ) {
+
+        return normalTotal;
+    }
+
+
+    const compactText =
+        compactPdfText(
+            pdfText
+        );
+
+
+    const compactProduct =
+        compactPdfText(
+            product
+        );
+
+
+    const compactTotal =
+        findUsingCompactText(
+            compactText,
+            compactProduct
+        );
+
+
+    if (
+        compactTotal !== null
+    ) {
+
+        return compactTotal;
+    }
+
+
+    return null;
+}
+
+
+
+// ==========================================
+// NORMALIZED TEXT MATCH
+// ==========================================
+
+function findUsingNormalizedText(
+    text,
+    product
+) {
+
+    const escapedProduct =
+        escapeRegex(
+            product
+        );
+
+
+    const unitPattern =
+        "(EA|CO|LB|BG|C\\s*8)";
+
+
+    const directPattern =
+        new RegExp(
+            escapedProduct +
+            "\\s*" +
+            "(?:-?\\s*1\\s*each\\s*)?" +
+            unitPattern +
+            "\\s+" +
+            "(-?\\s*\\d+(?:,\\d{3})*(?:\\.\\d+)?)",
+            "i"
+        );
+
+
+    let match =
+        text.match(
+            directPattern
+        );
+
+
+    if (match) {
+
+        return parseNumber(
+            match[2]
+        );
+    }
+
+
+    const oneEachPattern =
+        new RegExp(
+            escapedProduct +
+            "\\s+" +
+            "1\\s+each\\s+" +
+            unitPattern +
+            "\\s+" +
+            "(-?\\s*\\d+(?:,\\d{3})*(?:\\.\\d+)?)",
+            "i"
+        );
+
+
+    match =
+        text.match(
+            oneEachPattern
+        );
+
+
+    if (match) {
+
+        return parseNumber(
+            match[2]
+        );
+    }
+
+
+    const compactSpacingPattern =
+        new RegExp(
+            escapedProduct +
+            "\\s*" +
+            unitPattern +
+            "\\s*" +
+            "(-?\\s*\\d+(?:,\\d{3})*(?:\\.\\d+)?)",
+            "i"
+        );
+
+
+    match =
+        text.match(
+            compactSpacingPattern
+        );
+
+
+    if (match) {
+
+        return parseNumber(
+            match[2]
+        );
+    }
+
+
+    return null;
+}
+
+
+
+// ==========================================
+// COMPACT TEXT MATCH
+// ==========================================
+
+function findUsingCompactText(
+    text,
+    product
+) {
+
+    const escapedProduct =
+        escapeRegex(
+            product
+        );
+
+
+    const patterns = [
+
+        new RegExp(
+            escapedProduct +
+            "(?:-?1each)?" +
+            "EA" +
+            "(-?\\d+(?:,\\d{3})*(?:\\.\\d+)?)",
+            "i"
+        ),
+
+        new RegExp(
+            escapedProduct +
+            "(?:-?1each)?" +
+            "CO" +
+            "(-?\\d+(?:,\\d{3})*(?:\\.\\d+)?)",
+            "i"
+        ),
+
+        new RegExp(
+            escapedProduct +
+            "(?:-?1each)?" +
+            "BG" +
+            "(-?\\d+(?:,\\d{3})*(?:\\.\\d+)?)",
+            "i"
+        ),
+
+        new RegExp(
+            escapedProduct +
+            "(?:-?1each)?" +
+            "LB" +
+            "(-?\\d+(?:,\\d{3})*(?:\\.\\d+)?)",
+            "i"
+        ),
+
+        new RegExp(
+            escapedProduct +
+            "(?:-?1each)?" +
+            "C8" +
+            "(-?\\d+(?:,\\d{3})*(?:\\.\\d+)?)",
+            "i"
+        )
+    ];
+
+
+    for (
+        const pattern of patterns
+    ) {
+
+        const match =
+            text.match(
+                pattern
+            );
+
+
+        if (match) {
+
+            return parseNumber(
+                match[1]
+            );
+        }
+    }
+
+
+    return null;
+}
+
+
+
+// ==========================================
+// NORMALIZE PDF TEXT
+// ==========================================
+
+function normalizePdfText(
+    text
+) {
+
+    if (!text) {
+        return "";
+    }
+
+
+    return text
+        .replace(/\r/g, " ")
+        .replace(/\n/g, " ")
+        .replace(/\t/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+
+
+// ==========================================
+// COMPACT PDF TEXT
+// ==========================================
+
+function compactPdfText(
+    text
+) {
+
+    if (!text) {
+        return "";
+    }
+
+
+    return text
+        .replace(/\s+/g, "")
+        .toLowerCase();
+}
+
+
+
+// ==========================================
+// ESCAPE REGEX
+// ==========================================
+
+function escapeRegex(
+    text
+) {
+
+    return text.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&"
+    );
+}
+
+
+
+// ==========================================
+// PARSE NUMBER
+// ==========================================
+
+function parseNumber(
+    value
+) {
+
+    return parseFloat(
+        value
+            .replace(/,/g, "")
+            .replace(/\s+/g, "")
+    );
+}
+
+
+
+// ==========================================
+// GET PRODUCTION DAYS
+// ==========================================
+
+function getProductionDays(
+    pdfText
+) {
+
+    const reportPattern =
+        /Daily Production Report\s+(\d{2}\/\d{2}\/\d{4})\s*-\s*(\d{2}\/\d{2}\/\d{4})/i;
+
+
+    const match =
+        pdfText.match(
+            reportPattern
+        );
+
+
+    if (!match) {
+
+        console.warn(
+            "Could not find report date range."
+        );
+
+        return 1;
+    }
+
+
+    const startDate =
+        parseReportDate(
+            match[1]
+        );
+
+
+    const endDate =
+        parseReportDate(
+            match[2]
+        );
+
+
+    if (
+        !startDate ||
+        !endDate
+    ) {
+
+        console.warn(
+            "Could not parse report dates."
+        );
+
+        return 1;
+    }
+
+
+    let productionDays = 0;
+
+
+    const currentDate =
+        new Date(
+            startDate
+        );
+
+
+    while (
+        currentDate <= endDate
+    ) {
+
+        if (
+            currentDate.getDay() !== 0
+        ) {
+
+            productionDays++;
+        }
+
+
+        currentDate.setDate(
+            currentDate.getDate() + 1
+        );
+    }
+
+
+    return Math.max(
+        1,
+        productionDays
+    );
+}
+
+
+
+// ==========================================
+// PARSE REPORT DATE
+// ==========================================
+
+function parseReportDate(
+    dateString
+) {
+
+    const parts =
+        dateString.split("/");
+
+
+    if (
+        parts.length !== 3
+    ) {
+
+        return null;
+    }
+
+
+    const date =
+        new Date(
+            Number(parts[2]),
+            Number(parts[0]) - 1,
+            Number(parts[1])
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return null;
+    }
+
+
+    return date;
+}
+
+
+
+// ==========================================
+// FIND NEW / UNKNOWN PRODUCTS
+// ==========================================
+//
+// IMPORTANT:
+//
+// This version does NOT require the section
+// to be identified as sandwich/salad/compound
+// before looking for a product.
+//
+// It specifically looks for:
+//
+// FG CSC PRODUCT NAME CO 3
+//
+// and variations such as:
+//
+// FG CSC PRODUCT NAME
+// CO
+// 3
+//
+// This makes it much more tolerant of the
+// PDF's actual table structure.
+// ==========================================
+
+function findNewProducts(
+    pdfText,
+    knownProductRecipes
+) {
+
+    const newProducts = [];
+
+
+    if (
+        !pdfText ||
+        !knownProductRecipes
+    ) {
+
+        return newProducts;
+    }
+
+
+    const knownNames =
+        Object.keys(
+            knownProductRecipes
+        );
+
+
+    // ==========================================
+    // CREATE ALIAS LIST
+    // ==========================================
+
+    const allKnownNames = [
+        ...knownNames
+    ];
+
+
+    for (
+        const aliases of Object.values(
+            productAliases
+        )
+    ) {
+
+        allKnownNames.push(
+            ...aliases
+        );
+    }
+
+
+    // ==========================================
+    // NORMALIZE LINE STRUCTURE
+    // ==========================================
+
+    const text =
+        pdfText
+            .replace(/\r/g, "\n")
+            .replace(/\t/g, " ");
+
+
+    // ==========================================
+    // SPLIT BY FG CSC
+    // ==========================================
+
+    const sections =
+        text.split(
+            /FG(?:\s*zzz)?\s+(?:CSC|SALAD)(?:\s+GREEN)?\s+/i
+        );
+
+
+    // ==========================================
+    // PROCESS EACH FG CSC SECTION
+    // ==========================================
+
+    for (
+        const section of sections
+    ) {
+
+        if (
+            !section.trim()
+        ) {
+            continue;
+        }
+
+
+        // ======================================
+        // GET CATEGORY IF POSSIBLE
+        // ======================================
+
+        const category =
+            getProductCategory(
+                section
+            ) ||
+            "unknown";
+
+
+        // ======================================
+        // EXTRACT PRODUCTS
+        // ======================================
+
+        const candidates =
+            extractProductCandidates(
+                section,
+                category
+            );
+
+
+        for (
+            const candidate of candidates
+        ) {
+
+            let productName =
+                cleanDetectedProductName(
+                    candidate.name
+                );
+
+
+            if (!productName) {
+                continue;
+            }
+
+
+            // ==================================
+            // CLEAN THE PRODUCT NAME
+            // ==================================
+
+            productName =
+                cleanProductGarbage(
+                    productName
+                );
+
+
+            if (!productName) {
+                continue;
+            }
+
+
+            // ==================================
+            // IGNORE REPORT GARBAGE
+            // ==================================
+
+            if (
+                /\bFG\s+SALAD\s+GREEN\b/i.test(
+                    productName
+                )
+            ) {
+                continue;
+            }
+
+
+            if (
+                /^\s*\d+(?:\.\d+)?\s+-/.test(
+                    productName
+                )
+            ) {
+                continue;
+            }
+
+
+            const quantity =
+                candidate.quantity;
+
+
+            if (
+                quantity === null ||
+                Number.isNaN(quantity)
+            ) {
+                continue;
+            }
+
+
+            // ==================================
+            // CHECK KNOWN PRODUCTS
+            // ==================================
+
+            const isKnown =
+                allKnownNames.some(
+                    knownName =>
+                        productNamesMatch(
+                            productName,
+                            knownName
+                        )
+                );
+
+
+            if (isKnown) {
+                continue;
+            }
+
+
+            // ==================================
+            // ADD / COMBINE
+            // ==================================
+
+            const existing =
+                newProducts.find(
+                    item =>
+                        productNamesMatch(
+                            item.name,
+                            productName
+                        )
+                );
+
+
+            if (existing) {
+
+                existing.quantity +=
+                    quantity;
+
+            } else {
+
+                newProducts.push({
+
+                    name:
+                        productName,
+
+                    quantity:
+                        quantity,
+
+                    category:
+                        category
+                });
+            }
+        }
+    }
+
+
+    // ==========================================
+    // RETURN
+    // ==========================================
+
+    return newProducts.map(
+        item => ({
+            name: item.name,
+            quantity: item.quantity,
+            category: item.category
+        })
+    );
+}
+
+
+// ==========================================
+// FIND UNIQUE REPORT ITEMS
+// ==========================================
+//
+// The production report repeats an item on
+// later pages for each location. The first
+// occurrence is the row with a value in the
+// grey Totals column; repeated location rows
+// do not have that total. The text layer does
+// not expose cell colors, so the reliable
+// equivalent is to keep the first positive
+// total found for each normalized item name.
+//
+// This intentionally does not use the known
+// recipe list. The prep count must include
+// new items that are present on the form but
+// are not in the application yet.
+// ==========================================
+
+function findUniqueReportItems(
+    pdfText
+) {
+
+    const uniqueItems = [];
+
+
+    if (
+        !pdfText
+    ) {
+
+        return uniqueItems;
+    }
+
+
+    const text =
+        pdfText
+            .replace(/\r/g, "\n")
+            .replace(/\t/g, " ");
+
+
+    // Only pages with the Totals heading contain
+    // the grey first-occurrence total column. The
+    // remaining pages are location breakdowns.
+    const totalsPages =
+        text
+            .split(/__PDF_PAGE_BREAK__/i)
+            .filter(page => /\bTotals\b/i.test(page));
+
+
+    const sections =
+        totalsPages.flatMap(
+            page =>
+                page.split(
+                    /FG(?:\s*zzz)?\s+(?:CSC|SALAD)(?:\s+GREEN)?\s+/i
+                )
+        );
+
+
+    for (
+        const section of sections
+    ) {
+
+        if (
+            !section.trim()
+        ) {
+
+            continue;
+        }
+
+
+        const category =
+            getProductCategory(section) ||
+            "compound";
+
+
+        const candidates =
+            extractProductCandidates(
+                section,
+                category
+            );
+
+
+        for (
+            const candidate of candidates
+        ) {
+
+            let productName =
+                cleanDetectedProductName(
+                    candidate.name
+                );
+
+
+            productName =
+                cleanProductGarbage(
+                    productName
+                );
+
+
+            if (
+                !productName ||
+                candidate.quantity === null ||
+                Number.isNaN(candidate.quantity) ||
+                candidate.quantity <= 0 ||
+                !looksLikeProductName(productName)
+            ) {
+
+                continue;
+            }
+
+
+            const existing =
+                uniqueItems.find(
+                    item =>
+                        productNamesMatch(
+                            item.name,
+                            productName
+                        )
+                );
+
+
+            if (
+                !existing
+            ) {
+
+                uniqueItems.push({
+                    name: productName,
+                    quantity: candidate.quantity,
+                    category: category
+                });
+            }
+        }
+    }
+
+
+    return uniqueItems;
+}
+
+
+
+// ==========================================
+// GET PRODUCT CATEGORY
+// ==========================================
+
+function getProductCategory(
+    section
+) {
+
+    const upper =
+        section
+            .substring(
+                0,
+                300
+            )
+            .toUpperCase();
+
+
+    if (
+        upper.includes("SANDWICH")
+    ) {
+
+        return "sandwich";
+    }
+
+
+    if (
+        upper.includes("SALAD")
+    ) {
+
+        return "salad";
+    }
+
+
+    if (
+        upper.includes("GM")
+    ) {
+
+        return "compound";
+    }
+
+
+    return "compound";
+}
+
+
+
+// ==========================================
+// EXTRACT PRODUCT CANDIDATES
+// ==========================================
+//
+// Handles rows like:
+//
+// TOMATO Sliced 1/4" (For Food to Go)@ CO 3
+//
+// and:
+//
+// TOMATO Sliced 1/4" (For Food to Go)@
+// CO
+// 3
+//
+// ==========================================
+
+function extractProductCandidates(
+    section,
+    category
+) {
+
+    const candidates = [];
+
+
+    // ==========================================
+    // NORMALIZE ALL WHITESPACE
+    // ==========================================
+
+    let text =
+        section
+            .replace(/\r/g, " ")
+            .replace(/\n/g, " ")
+            .replace(/\t/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+
+    // ==========================================
+    // STOP AT TOTALS
+    // ==========================================
+
+    text =
+        text.split(
+            /\bTotal\b/i
+        )[0];
+
+
+    // ==========================================
+    // PRODUCT + UNIT + QUANTITY
+    // ==========================================
+    //
+    // Examples:
+    //
+    // TOMATO Sliced 1/4" (For Food to Go)@ CO 3
+    //
+    // Product Name EA 5
+    // Product Name LB 2
+    //
+    // ==========================================
+
+    const pattern =
+        /(.+?)(?:\s+1\s+each)?\s+(EA|CO|LB|BG|C\s*8)\s+(-?\s*(?:\d+(?:,\d{3})*(?:\.\d+)?|-))/gi;
+
+
+    let match;
+
+
+    while (
+        (match = pattern.exec(text)) !== null
+    ) {
+
+        let name =
+            match[1].trim();
+
+
+        const unit =
+            match[2]
+                .toUpperCase();
+
+
+        const quantityText =
+            match[3].trim();
+
+
+        // --------------------------------------
+        // Ignore dash / blank quantities
+        // --------------------------------------
+
+        if (
+            quantityText === "-" ||
+            quantityText === ""
+        ) {
+            continue;
+        }
+
+
+        const quantity =
+            parseNumber(
+                quantityText
+            );
+
+
+        if (
+            Number.isNaN(quantity)
+        ) {
+            continue;
+        }
+
+
+        // --------------------------------------
+        // Clean product name
+        // --------------------------------------
+
+        name =
+            cleanDetectedProductName(
+                name
+            );
+
+
+        name =
+            removeCategoryWords(
+                name
+            );
+
+
+        name =
+            cleanProductGarbage(
+                name
+            );
+
+
+        if (
+            !name
+        ) {
+            continue;
+        }
+
+
+        if (
+            !looksLikeProductName(
+                name
+            )
+        ) {
+            continue;
+        }
+
+
+        candidates.push({
+
+            name:
+                name,
+
+            quantity:
+                quantity,
+
+            unit:
+                unit,
+
+            category:
+                category
+        });
+    }
+
+
+    // ==========================================
+    // SECOND PASS
+    // ==========================================
+    //
+    // Handles PDFs where the table columns
+    // become separate lines.
+    //
+    // Example:
+    //
+    // TOMATO Sliced 1/4" (For Food to Go)@
+    // CO
+    // 3
+    //
+    // ==========================================
+
+    const lines =
+        section
+            .split(/\n+/)
+            .map(
+                line =>
+                    line.trim()
+            )
+            .filter(
+                line =>
+                    line
+            );
+
+
+    for (
+        let i = 0;
+        i < lines.length;
+        i++
+    ) {
+
+        const line =
+            lines[i];
+
+
+        // ======================================
+        // CASE 1:
+        //
+        // PRODUCT
+        // CO
+        // 3
+        // ======================================
+
+        if (
+            i + 2 < lines.length
+        ) {
+
+            const unitLine =
+                lines[i + 1];
+
+
+            const quantityLine =
+                lines[i + 2];
+
+
+            const validUnit =
+                /^(EA|CO|LB|BG|C\s*8)$/i.test(
+                    unitLine
+                );
+
+
+            const validQuantity =
+                /^-?\d+(?:,\d{3})*(?:\.\d+)?$/.test(
+                    quantityLine
+                );
+
+
+            if (
+                validUnit &&
+                validQuantity
+            ) {
+
+                let name =
+                    cleanDetectedProductName(
+                        line
+                    );
+
+
+                name =
+                    removeCategoryWords(
+                        name
+                    );
+
+
+                name =
+                    cleanProductGarbage(
+                        name
+                    );
+
+
+                const quantity =
+                    parseNumber(
+                        quantityLine
+                    );
+
+
+                if (
+                    name &&
+                    looksLikeProductName(
+                        name
+                    )
+                ) {
+
+                    candidates.push({
+
+                        name:
+                            name,
+
+                        quantity:
+                            quantity,
+
+                        unit:
+                            unitLine.toUpperCase(),
+
+                        category:
+                            category
+                    });
+                }
+
+
+                // We found a complete
+                // PRODUCT / UNIT / QUANTITY row.
+                continue;
+            }
+        }
+
+
+        // ======================================
+        // CASE 2:
+        //
+        // PRODUCT
+        // 3
+        //
+        // ======================================
+
+        if (
+            i + 1 < lines.length
+        ) {
+
+            const quantityLine =
+                lines[i + 1];
+
+
+            const validQuantity =
+                /^\d+(?:,\d{3})*(?:\.\d+)?$/.test(
+                    quantityLine
+                );
+
+
+            if (
+                validQuantity
+            ) {
+
+                // Only use this fallback when
+                // the line actually looks like
+                // a product/report row.
+
+                if (
+                    /\b(FG|CSC|SANDWICH|SALAD|GM)\b/i.test(
+                        line
+                    )
+                ) {
+
+                    let name =
+                        cleanDetectedProductName(
+                            line
+                        );
+
+
+                    name =
+                        removeCategoryWords(
+                            name
+                        );
+
+
+                    name =
+                        cleanProductGarbage(
+                            name
+                        );
+
+
+                    const quantity =
+                        parseNumber(
+                            quantityLine
+                        );
+
+
+                    if (
+                        name &&
+                        looksLikeProductName(
+                            name
+                        )
+                    ) {
+
+                        candidates.push({
+
+                            name:
+                                name,
+
+                            quantity:
+                                quantity,
+
+                            unit:
+                                "EA",
+
+                            category:
+                                category
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+
+    return candidates;
+}
+
+
+
+// ==========================================
+// REMOVE CATEGORY WORDS
+// ==========================================
+
+function removeCategoryWords(
+    name
+) {
+
+    let cleaned =
+        name;
+
+
+    cleaned =
+        cleaned.replace(
+            /^SANDWICH\s+/i,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /^SALAD\s+GREEN\s+/i,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /^SALAD\s+/i,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /^GREEN\s+/i,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /^GM\s+/i,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /^MTC\s+/i,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /^CONCESSION\s+S\s+ONLY\s+/i,
+            ""
+        );
+
+
+    return cleaned.trim();
+}
+
+
+
+// ==========================================
+// CLEAN PRODUCT GARBAGE
+// ==========================================
+
+function cleanProductGarbage(
+    name
+) {
+
+    let cleaned =
+        name;
+
+
+    // ------------------------------------------
+    // Remove FG CSC
+    // ------------------------------------------
+
+    cleaned =
+        cleaned.replace(
+            /^(?:FG\s+CSC\s+)+/i,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /^(?:FG\s+)?CSC\s+/i,
+            ""
+        );
+
+
+    // ------------------------------------------
+    // Remove category prefixes
+    // ------------------------------------------
+
+    cleaned =
+        cleaned.replace(
+            /^(?:SANDWICH|SALAD|GREEN|GM|MTC)\s+/i,
+            ""
+        );
+
+
+    // ------------------------------------------
+    // Remove delivery notes
+    // ------------------------------------------
+
+    cleaned =
+        cleaned.replace(
+            /\s*\(Wed\.\s*&\s*Fri\s*Delivery\)\s*/gi,
+            ""
+        );
+
+
+    // ------------------------------------------
+    // Remove 1 each
+    // ------------------------------------------
+
+    cleaned =
+        cleaned.replace(
+            /\s+1\s+each\s*$/i,
+            ""
+        );
+
+
+    // ------------------------------------------
+    // Remove standalone report units
+    // ------------------------------------------
+
+    cleaned =
+        cleaned.replace(
+            /\b(?:EA|CO|QT|LB|BG|C\s*8)\b/gi,
+            ""
+        );
+
+
+    // ------------------------------------------
+    // Remove report dash
+    // ------------------------------------------
+
+    cleaned =
+        cleaned.replace(
+            /\s+-\s*/g,
+            " "
+        );
+
+
+    // ------------------------------------------
+    // Remove trailing @
+    //
+    // IMPORTANT:
+    //
+    // The @ is part of the PDF report formatting,
+    // NOT part of the actual product name.
+    // ------------------------------------------
+
+    cleaned =
+        cleaned.replace(
+            /@+\s*$/g,
+            ""
+        );
+
+
+    // ------------------------------------------
+    // Collapse whitespace
+    // ------------------------------------------
+
+    cleaned =
+        cleaned.replace(
+            /\s+/g,
+            " "
+        );
+
+
+    return cleaned.trim();
+}
+
+
+
+// ==========================================
+// CLEAN DETECTED PRODUCT NAME
+// ==========================================
+
+function cleanDetectedProductName(
+    name
+) {
+
+    let cleaned =
+        name.trim();
+
+
+    cleaned =
+        cleaned.replace(
+            /^(?:FG\s+CSC\s+)+/i,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /^GM\s+/i,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /^MTC\s+/i,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /^SANDWICH\s+/i,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /^SALAD\s+GREEN\s+/i,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /^SALAD\s+/i,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /^GREEN\s+/i,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /\s+1\s+each\s*$/i,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /\s*\(Wed\.\s*&\s*Fri\s*Delivery\)\s*/gi,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /@+\s*$/g,
+            ""
+        );
+
+
+    cleaned =
+        cleaned.replace(
+            /\s+/g,
+            " "
+        );
+
+
+    return cleaned.trim();
+}
+
+
+
+// ==========================================
+// LOOKS LIKE PRODUCT NAME
+// ==========================================
+
+function looksLikeProductName(
+    name
+) {
+
+    if (
+        !name
+    ) {
+        return false;
+    }
+
+
+    const cleaned =
+        name.trim();
+
+
+    if (
+        cleaned.length < 2
+    ) {
+        return false;
+    }
+
+
+    if (
+        /^\d+(?:\.\d+)?$/.test(
+            cleaned
+        )
+    ) {
+        return false;
+    }
+
+
+    // Location columns can be extracted as a
+    // string of dashes and quantities. That is
+    // report data, not a product name.
+    if (
+        !/[A-Za-z]/.test(cleaned) ||
+        /^[\s\d.,+-]+$/.test(cleaned)
+    ) {
+
+        return false;
+    }
+
+
+    if (
+        /^(?:Total|CSC Garde Manger Total|Dining Services Total)/i.test(
+            cleaned
+        )
+    ) {
+        return false;
+    }
+
+
+    if (
+        /^\d{2}\/\d{2}\/\d{4}/.test(
+            cleaned
+        )
+    ) {
+        return false;
+    }
+
+
+    return true;
+}
+
+
+
+// ==========================================
+// PRODUCT NAME COMPARISON
+// ==========================================
+
+function productNamesMatch(
+    nameA,
+    nameB
+) {
+
+    const normalize =
+        name =>
+            name
+                .toLowerCase()
+                .replace(
+                    /\s+/g,
+                    " "
+                )
+                .replace(
+                    /[^a-z0-9]+/g,
+                    ""
+                );
+
+
+    return (
+        normalize(nameA) ===
+        normalize(nameB)
+    );
+}
+
+
+
+// ==========================================
+// BREAD ORDER SETTINGS
+// ==========================================
+
+const SANDWICHES_PER_PACKAGE = {
+
+    "White": 9,
+
+    "Wheat": 9,
+
+    "Sprout": 6,
+
+    "Sourdough": 8,
+
+    "Honey": 8,
+
+    "Ciabatta": 12,
+
+    "Hoagie": 12
+};
+
+
+const BREAD_TYPES = [
+    "White",
+    "Wheat",
+    "Sprout",
+    "Sourdough",
+    "Honey",
+    "Ciabatta",
+    "Hoagie"
+];
+
+
+const STORAGE_KEY =
+    "inventoryCalculatorPreviousOrder";
+
+
+let lastCalculatedOrder = null;
+let currentFormOrders = null;
+let remainingSandwichOrders = null;
+let todayFormOrders = null;
+let todayRemainingSandwichOrders = null;
+
+
+// ==========================================
+// BREAD RECIPES
+// ==========================================
+
+const breadRecipes = {
+
+    // ======================================
+    // SANDWICHES
+    // ======================================
+
+    "Wedge White PB&J": {
+        bread: "White",
+        units: 1,
+        order: true
+    },
+
+    "Wedge Tuna Wheat": {
+        bread: "Wheat",
+        units: 1,
+        order: true
+    },
+
+    "Wedge Egg Wheat": {
+        bread: "Wheat",
+        units: 1,
+        order: true
+    },
+
+    "Sprout Vegetarian Pillow": {
+        bread: "Sprout",
+        units: 1,
+        order: true
+    },
+
+    "Sprout Turkey Cranberry Pillow": {
+        bread: "Sprout",
+        units: 1,
+        order: true
+    },
+
+    "Crunch": {
+        bread: "Sprout",
+        units: 1,
+        order: true
+    },
+
+    "Roast Beef on Sourdough": {
+        bread: "Sourdough",
+        units: 1,
+        order: true
+    },
+
+    "Sweet Heat": {
+        bread: "Honey",
+        units: 1,
+        order: true
+    },
+
+    "Pit Beef": {
+        bread: "Honey",
+        units: 1,
+        order: true
+    },
+
+    "Panini Turkey, Bacon, Avocado": {
+        bread: "Ciabatta",
+        units: 1,
+        order: true
+    },
+
+    "Panini Italian": {
+        bread: "Ciabatta",
+        units: 1,
+        order: true
+    },
+
+    "Panini Bacon Egg Cheese": {
+        bread: "Ciabatta",
+        units: 1,
+        order: true
+    },
+
+    "Sausage Egg Panini": {
+        bread: "Ciabatta",
+        units: 1,
+        order: true
+    },
+
+    "Deli Ham & Cheddar": {
+        bread: "Hoagie",
+        units: 1,
+        order: true
+    },
+
+    "Deli Turkey & Swiss": {
+        bread: "Hoagie",
+        units: 1,
+        order: true
+    },
+
+    "Panini Turkey Sausage Egg Cheese": {
+        bread: "Ciabatta",
+        units: 1,
+        order: true
+    },
+
+    "Turkey Cranberry": {
+        bread: "Sprout",
+        units: 1,
+        order: true
+    },
+
+    "Ciabatta Turkey": {
+        bread: "Ciabatta",
+        units: 1,
+        order: true,
+        excludeCONE: true
+    },
+
+    "Panini Turkey Provolone": {
+        bread: "Ciabatta",
+        units: 1,
+        order: true
+    },
+
+    "Heritage Panini Ham & Cheese": {
+        bread: "Ciabatta",
+        units: 1,
+        order: true
+    },
+
+    "Challah Ham and Cheese Pesto/ Concession S Only": {
+        bread: "Ciabatta",
+        units: 1,
+        order: true,
+        excludeCONE: true
+    },
+
+
+    // ======================================
+    // SANDWICHES â€” REFERENCE ONLY
+    // ======================================
+    //
+    // These are still sandwiches.
+    //
+    // They are NOT removed from the sandwich
+    // list just because their bread is not
+    // something we order.
+    //
+    // order:false means they do not affect
+    // the bread order calculation.
+    //
+    // ======================================
+
+    "Challah Turkey & Swiss": {
+        bread: "Challah",
+        units: 1,
+        order: false,
+        excludeCONE: true
+    },
+
+    "Challah Chicken and Arugula": {
+        bread: "Challah",
+        units: 1,
+        order: false
+    },
+
+    "Challah Chicken BBQ": {
+        bread: "Challah",
+        units: 1,
+        order: false
+    },
+
+    "Challah Chicken Bacon Ranch Asiago": {
+        bread: "Challah",
+        units: 1,
+        order: false
+    },
+
+    "Challah Club": {
+        bread: "Challah",
+        units: 1,
+        order: false
+    },
+
+    "Challah Italian": {
+        bread: "Challah",
+        units: 1,
+        order: false
+    },
+
+    "Croissant Turkey/ Gouda": {
+        bread: "Croissant",
+        units: 1,
+        order: false
+    },
+
+    "Croissant Chicken Salad": {
+        bread: "Croissant",
+        units: 1,
+        order: false
+    },
+
+    "Croissant Ham & Swiss": {
+        bread: "Croissant",
+        units: 1,
+        order: false
+    },
+
+    "Croissant Turkey/Swiss": {
+        bread: "Croissant",
+        units: 1,
+        order: false
+    },
+
+    "Kaiser Club Gluten Free": {
+        bread: "Gluten Free",
+        units: 1,
+        order: false
+    },
+
+    "Kaiser Italian Gluten Free": {
+        bread: "Gluten Free",
+        units: 1,
+        order: false
+    },
+
+    "Kaiser Turkey and Swiss Gluten Free": {
+        bread: "Gluten Free",
+        units: 1,
+        order: false
+    },
+
+    "Chicken Salad Kaiser": {
+        bread: "Kaiser",
+        units: 1,
+        order: false
+    },
+
+    "Tortilla Club Wrap": {
+        bread: "Tortilla",
+        units: 1,
+        order: false
+    },
+
+    "Vending Turmeric Curry Garbanzo": {
+        bread: "Tortilla",
+        units: 1,
+        order: false
+    }
+};
+
+
+// ==========================================
+// CREATE INPUTS
+// ==========================================
+
+function createBreadInputs(
+    containerId,
+    prefix
+) {
+
+    const container =
+        document.getElementById(
+            containerId
+        );
+
+    container.innerHTML = "";
+
+    for (const bread of BREAD_TYPES) {
+
+        const row =
+            document.createElement("div");
+
+        row.className =
+            "bread-input-row";
+
+        row.innerHTML = `
+            <label for="${prefix}-${bread}">
+                ${bread}
+            </label>
+
+            <input
+                type="number"
+                id="${prefix}-${bread}"
+                min="0"
+                step="1"
+                value="0"
+            >
+        `;
+
+        container.appendChild(row);
+    }
+}
+
+
+// ==========================================
+// GET INPUT VALUES
+// ==========================================
+
+function getBreadInputValues(prefix) {
+
+    const values = {};
+
+    for (const bread of BREAD_TYPES) {
+
+        const input =
+            document.getElementById(
+                `${prefix}-${bread}`
+            );
+
+        values[bread] =
+            Number(input.value) || 0;
+    }
+
+    return values;
+}
+
+
+// ==========================================
+// SET INPUT VALUES
+// ==========================================
+
+function setBreadInputValues(
+    prefix,
+    values
+) {
+
+    for (const bread of BREAD_TYPES) {
+
+        const input =
+            document.getElementById(
+                `${prefix}-${bread}`
+            );
+
+        input.value =
+            values[bread] || 0;
+    }
+}
+
+
+// ==========================================
+// LOAD PREVIOUS ORDER
+// ==========================================
+
+function loadPreviousOrder() {
+
+    const saved =
+        localStorage.getItem(
+            STORAGE_KEY
+        );
+
+    if (!saved) {
+        return null;
+    }
+
+    try {
+
+        const data =
+            JSON.parse(saved);
+
+        const savedDate = new Date(data.date);
+
+        if (
+            !data.date ||
+            !data.packages ||
+            typeof data.packages !== "object" ||
+            Number.isNaN(savedDate.getTime())
+        ) {
+
+            console.warn(
+                "Old previous-order data found. Clearing it."
+            );
+
+            localStorage.removeItem(
+                STORAGE_KEY
+            );
+
+            return null;
+        }
+
+        return data;
+
+    } catch (error) {
+
+        console.error(
+            "Could not read saved previous order:",
+            error
+        );
+
+        localStorage.removeItem(
+            STORAGE_KEY
+        );
+
+        return null;
+    }
+}
+
+
+// ==========================================
+// SAVE PREVIOUS ORDER
+// ==========================================
+
+function savePreviousOrder() {
+
+    const packages =
+        getBreadInputValues(
+            "previous"
+        );
+
+    const previousOrderDate =
+        getExpectedPreviousOrderDate();
+
+    const orderData = {
+
+        date:
+            previousOrderDate.toISOString(),
+
+        packages:
+            packages
+    };
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(orderData)
+    );
+
+    updatePreviousOrderDisplay();
+}
+
+
+// ==========================================
+// RESET PREVIOUS ORDER
+// ==========================================
+
+function resetPreviousOrder() {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to reset the previous order? You will need to enter it again."
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    localStorage.removeItem(
+        STORAGE_KEY
+    );
+
+    setBreadInputValues(
+        "previous",
+        {}
+    );
+
+    updatePreviousOrderDisplay();
+}
+
+
+// ==========================================
+// SAVE TODAY'S ORDER
+// ==========================================
+
+function saveTodaysOrder() {
+
+    if (!lastCalculatedOrder) {
+
+        alert(
+            "Please analyze tomorrow's PDF and get the bread order first."
+        );
+
+        return;
+    }
+
+    const today =
+        new Date();
+
+    const existingOrder =
+        loadPreviousOrder();
+
+    let sameDayOrder = false;
+
+    if (existingOrder) {
+
+        const existingDate =
+            new Date(existingOrder.date);
+
+        sameDayOrder =
+            existingDate.getFullYear() ===
+                today.getFullYear() &&
+
+            existingDate.getMonth() ===
+                today.getMonth() &&
+
+            existingDate.getDate() ===
+                today.getDate();
+    }
+
+    const newPackages = {};
+
+    for (const bread of BREAD_TYPES) {
+
+        newPackages[bread] =
+            lastCalculatedOrder[bread]
+                .packagesToOrder;
+    }
+
+    if (sameDayOrder) {
+
+        let message =
+            "You may be ordering bread for today more than once.\n\n";
+
+        message +=
+            "This new order will ADD the following:\n\n";
+
+        let hasNewBread = false;
+
+        for (const bread of BREAD_TYPES) {
+
+            const added =
+                newPackages[bread] || 0;
+
+            if (added > 0) {
+
+                message +=
+                    `${bread}: ${added} package(s)\n`;
+
+                hasNewBread = true;
+            }
+        }
+
+        if (!hasNewBread) {
+
+            message +=
+                "No additional bread.\n";
+        }
+
+        message +=
+            "\nDo you want to add this order to today's existing order?";
+
+        const confirmed =
+            confirm(message);
+
+        if (!confirmed) {
+            return;
+        }
+
+        for (const bread of BREAD_TYPES) {
+
+            const existing =
+                existingOrder.packages[bread] || 0;
+
+            const added =
+                newPackages[bread] || 0;
+
+            newPackages[bread] =
+                existing + added;
+        }
+    }
+
+    const orderData = {
+
+        date:
+            today.toISOString(),
+
+        packages:
+            newPackages
+    };
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(orderData)
+    );
+
+    updatePreviousOrderDisplay();
+
+    document
+        .getElementById(
+            "saveTodaysOrderButton"
+        )
+        .disabled = true;
+
+    if (sameDayOrder) {
+
+        alert(
+            "The additional bread order has been added to the existing saved order."
+        );
+
+    } else {
+
+        alert(
+            "Tomorrow's bread order has been saved as the new saved order."
+        );
+    }
+}
+
+
+// ==========================================
+// FORMAT DATE
+// ==========================================
+
+function formatDate(dateString) {
+
+    const date =
+        new Date(dateString);
+
+    return date.toLocaleDateString(
+        undefined,
+        {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        }
+    );
+}
+
+
+// ==========================================
+// GET EXPECTED PREVIOUS ORDER DATE
+// ==========================================
+
+function getExpectedPreviousOrderDate() {
+
+    const today = new Date();
+
+    const dayOfWeek =
+        today.getDay();
+
+    const expectedDate =
+        new Date(today);
+
+    if (dayOfWeek === 1) {
+
+        expectedDate.setDate(
+            today.getDate() - 2
+        );
+
+    } else {
+
+        expectedDate.setDate(
+            today.getDate() - 1
+        );
+    }
+
+    return expectedDate;
+}
+
+
+// ==========================================
+// UPDATE PREVIOUS ORDER DISPLAY
+// ==========================================
+
+function updatePreviousOrderDisplay() {
+
+    const status =
+        document.getElementById(
+            "previousOrderStatus"
+        );
+
+    const instructions =
+        document.getElementById(
+            "previousOrderInstructions"
+        );
+
+    const dateDisplay =
+        document.getElementById(
+            "previousOrderDate"
+        );
+
+    const saved =
+        loadPreviousOrder();
+
+    if (saved) {
+
+        status.textContent =
+            "Previous order loaded âœ“";
+
+        status.className =
+            "saved-status";
+
+        instructions.textContent =
+            "The saved previous order is shown below. You can edit it if necessary.";
+
+        dateDisplay.textContent =
+            "Order Date: " +
+            formatDate(
+                saved.date
+            );
+
+        dateDisplay.className =
+            "order-date";
+
+        setBreadInputValues(
+            "previous",
+            saved.packages
+        );
+
+    } else {
+
+        status.textContent =
+            "No previous order saved.";
+
+        status.className =
+            "missing-status";
+
+        instructions.textContent =
+            "Since this is the first time using the calculator, enter yesterday's order below.";
+
+        dateDisplay.textContent =
+            "";
+
+        dateDisplay.className =
+            "";
+
+        setBreadInputValues(
+            "previous",
+            {}
+        );
+    }
+
+    checkPreviousOrderDate();
+}
+
+
+// ==========================================
+// CHECK PREVIOUS ORDER DATE
+// ==========================================
+
+function checkPreviousOrderDate() {
+
+    const saved =
+        loadPreviousOrder();
+
+    const warning =
+        document.getElementById(
+            "previousOrderDateWarning"
+        );
+
+    if (!warning) {
+        return;
+    }
+
+    warning.textContent = "";
+    warning.className = "";
+
+    if (!saved) {
+        return;
+    }
+
+    const expectedDate =
+        getExpectedPreviousOrderDate();
+
+    const savedDate =
+        new Date(saved.date);
+
+    const dateMatches =
+        expectedDate.getFullYear() ===
+            savedDate.getFullYear() &&
+
+        expectedDate.getMonth() ===
+            savedDate.getMonth() &&
+
+        expectedDate.getDate() ===
+            savedDate.getDate();
+
+    if (!dateMatches) {
+
+        warning.innerHTML = `
+            âš ï¸ <strong>Please verify the previous order date.</strong>
+            <br>
+            Based on the normal ordering schedule,
+            the previous order would normally be
+            <strong>${formatDate(expectedDate)}</strong>.
+            <br>
+            The saved order is from
+            <strong>${formatDate(saved.date)}</strong>.
+            <br>
+            This may be correct if the location was closed,
+            there was a holiday, or an order was missed.
+        `;
+
+        warning.className =
+            "date-warning";
+
+    } else {
+
+        warning.innerHTML = `
+            âœ“ Previous order date matches the
+            expected ordering schedule.
+        `;
+
+        warning.className =
+            "date-ok";
+    }
+}
+
+
+// ==========================================
+// TRAY REQUIREMENTS
+// ==========================================
+
+const TRAY_CAPACITY = {
+    Croissant: 15,
+    Ciabatta: 15,
+    Challah: 15,
+    Hoagie: 20,
+    Wedge: 15
+};
+
+function getSandwichTrayType(product, recipe) {
+    if (/^Wedge\b/i.test(product)) {
+        return "Wedge";
+    }
+
+    if (/^Challah\b/i.test(product)) {
+        return "Challah";
+    }
+
+    if (!recipe) {
+        return null;
+    }
+
+    return TRAY_CAPACITY[recipe.bread]
+        ? recipe.bread
+        : null;
+}
+
+function calculateTrayRequirements(orders) {
+    const trays = {};
+
+    for (const [product, quantity] of Object.entries(orders || {})) {
+        const trayType = getSandwichTrayType(product, breadRecipes[product]);
+        const capacity = trayType ? TRAY_CAPACITY[trayType] : null;
+
+        if (!capacity || Number(quantity) <= 0) {
+            continue;
+        }
+
+        trays[trayType] = (trays[trayType] || 0) + Number(quantity);
+    }
+
+    for (const trayType of Object.keys(trays)) {
+        trays[trayType] = Math.ceil(trays[trayType] / TRAY_CAPACITY[trayType]);
+    }
+
+    return trays;
+}
+
+
+// ==========================================
+// SANDWICH ADJUSTMENTS
+// ==========================================
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+
+function refreshBreadOrderResults() {
+    const orders = remainingSandwichOrders || {};
+    const breadTotals = calculateBread(orders);
+    const todayBreadTotals = calculateBread(todayRemainingSandwichOrders || {});
+
+    displayBreadResults(orders, breadTotals, todayBreadTotals);
+}
+
+function confirmSandwichCountChange(product, currentQuantity, nextQuantity) {
+    return confirm(
+        `Are you sure you want to change the ${product} sandwich order count ` +
+        `from ${currentQuantity} to ${nextQuantity}?`
+    );
+}
+
+function setRemainingSandwichQuantity(product, nextQuantity) {
+    const currentQuantity = Number(remainingSandwichOrders[product]) || 0;
+    const quantity = Math.max(0, Math.floor(Number(nextQuantity) || 0));
+
+    if (quantity === currentQuantity) {
+        return;
+    }
+
+    if (!confirmSandwichCountChange(product, currentQuantity, quantity)) {
+        renderSandwichAdjustments();
+        return;
+    }
+
+    remainingSandwichOrders[product] = quantity;
+    renderSandwichAdjustments();
+    refreshBreadOrderResults();
+}
+
+function renderSandwichAdjustments() {
+    const container = document.getElementById("tomorrowSandwichAdjustments");
+
+    if (!container || !remainingSandwichOrders) {
+        return;
+    }
+
+    const products = Object.keys(remainingSandwichOrders);
+    const rows = products.map((product, index) => {
+        const originalQuantity = currentFormOrders
+            ? currentFormOrders[product]
+            : undefined;
+        const remainingQuantity = remainingSandwichOrders[product] || 0;
+        const originalLabel = originalQuantity === undefined
+            ? "Special order"
+            : originalQuantity;
+
+        return `
+            <tr>
+                <td>${escapeHtml(product)}</td>
+                <td>${originalLabel}</td>
+                <td>
+                    <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value="${remainingQuantity}"
+                        data-sandwich-input="${index}"
+                    >
+                </td>
+                <td>
+                    <button type="button" data-sandwich-action="decrease" data-sandwich-index="${index}">âˆ’</button>
+                    <button type="button" data-sandwich-action="increase" data-sandwich-index="${index}">+</button>
+                </td>
+            </tr>
+        `;
+    }).join("");
+
+    const options = Object.keys(breadRecipes)
+        .filter(product => breadRecipes[product].order)
+        .map(product => `<option value="${escapeHtml(product)}">${escapeHtml(product)}</option>`)
+        .join("");
+
+    container.innerHTML = `
+        <h2>Update Tomorrow's Sandwiches</h2>
+        <p>
+            Adjust the tomorrow quantity after reviewing the production form.
+            Every quantity change requires confirmation.
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Sandwich</th>
+                    <th>Form Total</th>
+                    <th>Still to Make</th>
+                    <th>Change</th>
+                </tr>
+            </thead>
+            <tbody>${rows || "<tr><td colspan=\"4\">No sandwiches found.</td></tr>"}</tbody>
+        </table>
+        <div class="special-order-controls">
+            <label for="specialSandwichSelect">Special-order sandwich</label>
+            <select id="specialSandwichSelect">
+                <option value="">Select a sandwich</option>
+                ${options}
+            </select>
+            <input id="specialSandwichQuantity" type="number" min="1" step="1" value="1">
+            <button type="button" id="addSpecialSandwichButton">Add Sandwiches</button>
+        </div>
+    `;
+
+    const productAt = index => products[index];
+
+    container.querySelectorAll("[data-sandwich-action]").forEach(button => {
+        button.addEventListener("click", () => {
+            const product = productAt(Number(button.dataset.sandwichIndex));
+            const current = Number(remainingSandwichOrders[product]) || 0;
+            const change = button.dataset.sandwichAction === "increase" ? 1 : -1;
+            setRemainingSandwichQuantity(product, current + change);
+        });
+    });
+
+    container.querySelectorAll("[data-sandwich-input]").forEach(input => {
+        input.addEventListener("change", () => {
+            const product = productAt(Number(input.dataset.sandwichInput));
+            setRemainingSandwichQuantity(product, input.value);
+        });
+    });
+
+    document.getElementById("addSpecialSandwichButton").addEventListener("click", () => {
+        const product = document.getElementById("specialSandwichSelect").value;
+        const quantity = Math.max(
+            0,
+            Math.floor(Number(document.getElementById("specialSandwichQuantity").value) || 0)
+        );
+
+        if (!product || quantity < 1) {
+            alert("Select a sandwich and enter a quantity greater than zero.");
+            return;
+        }
+
+        const current = Number(remainingSandwichOrders[product]) || 0;
+        setRemainingSandwichQuantity(product, current + quantity);
+    });
+
+    container.style.display = "block";
+}
+
+function setTodaySandwichQuantity(product, nextQuantity) {
+    const currentQuantity = Number(todayRemainingSandwichOrders[product]) || 0;
+    const quantity = Math.max(0, Math.floor(Number(nextQuantity) || 0));
+
+    if (quantity === currentQuantity) {
+        return;
+    }
+
+    if (!confirmSandwichCountChange(product, currentQuantity, quantity)) {
+        renderTodayBreadProduction();
+        return;
+    }
+
+    todayRemainingSandwichOrders[product] = quantity;
+    renderTodayBreadProduction();
+    refreshBreadOrderResults();
+}
+
+const TODAY_PRODUCTION_GROUPS = [
+    { label: "Wedges", key: "Wedge" },
+    { label: "Sprouts", key: "Sprout" },
+    { label: "Honey", key: "Honey" },
+    { label: "Ciabatta", key: "Ciabatta" },
+    { label: "Hoagies", key: "Hoagie" },
+    { label: "Sourdough", key: "Sourdough" }
+];
+
+function getTodayProductionGroup(product, recipe) {
+    if (/^(Challah|Croissant|Kaiser|Tortilla)\b/i.test(product)) {
+        return null;
+    }
+
+    if (/^Wedge\b/i.test(product)) {
+        return "Wedge";
+    }
+
+    return recipe && recipe.bread;
+}
+
+function renderTodayBreadProduction() {
+    const container = document.getElementById("todayBreadProduction");
+
+    if (!container) {
+        return;
+    }
+
+    if (!todayRemainingSandwichOrders) {
+        container.innerHTML = `
+            <h2>Today's Bread Production</h2>
+            <p>No today's production has been loaded.</p>
+        `;
+        return;
+    }
+
+    const displayedProducts = Object.keys(todayRemainingSandwichOrders)
+        .filter(product => TODAY_PRODUCTION_GROUPS.some(group =>
+            group.key === getTodayProductionGroup(product, breadRecipes[product])
+        ));
+
+    const productIndexes = displayedProducts.reduce((indexes, product, index) => {
+        indexes[product] = index;
+        return indexes;
+    }, {});
+
+    const groupSections = TODAY_PRODUCTION_GROUPS.map(group => {
+        const products = displayedProducts.filter(product =>
+            getTodayProductionGroup(product, breadRecipes[product]) === group.key
+        );
+
+        if (!products.length) {
+            return "";
+        }
+
+        const total = products.reduce(
+            (sum, product) => sum + (Number(todayRemainingSandwichOrders[product]) || 0),
+            0
+        );
+
+        const rows = products.map(product => {
+            const index = productIndexes[product];
+
+            return `
+                <tr>
+                    <td>${escapeHtml(product)}</td>
+                    <td>${todayFormOrders[product]}</td>
+                    <td>
+                        <input
+                            type="number"
+                            min="0"
+                            step="1"
+                            value="${todayRemainingSandwichOrders[product] || 0}"
+                            data-today-sandwich-input="${index}"
+                        >
+                    </td>
+                    <td>
+                        <button type="button" data-today-sandwich-action="decrease" data-today-sandwich-index="${index}">âˆ’</button>
+                        <button type="button" data-today-sandwich-action="increase" data-today-sandwich-index="${index}">+</button>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+
+        return `
+            <details class="today-production-dropdown">
+                <summary>${group.label} â€” ${total} sandwich(es)</summary>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sandwich</th>
+                            <th>Form Total</th>
+                            <th>Still to Make</th>
+                            <th>Change</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </details>
+        `;
+    }).join("");
+
+    container.innerHTML = `
+        <h2>Today's Bread Production</h2>
+        <p>Only bread types used for tomorrow's bread order are shown.</p>
+        ${groupSections || "<p>No wedges, sprouts, honey, ciabatta, hoagies, or sourdough were found.</p>"}
+    `;
+
+    const productAt = index => displayedProducts[index];
+
+    container.querySelectorAll("[data-today-sandwich-action]").forEach(button => {
+        button.addEventListener("click", () => {
+            const product = productAt(Number(button.dataset.todaySandwichIndex));
+            const current = Number(todayRemainingSandwichOrders[product]) || 0;
+            const change = button.dataset.todaySandwichAction === "increase" ? 1 : -1;
+            setTodaySandwichQuantity(product, current + change);
+        });
+    });
+
+    container.querySelectorAll("[data-today-sandwich-input]").forEach(input => {
+        input.addEventListener("change", () => {
+            const product = productAt(Number(input.dataset.todaySandwichInput));
+            setTodaySandwichQuantity(product, input.value);
+        });
+    });
+}
+
+function renderTodayBreadProductionLegacy() {
+    const container = document.getElementById("todayBreadProduction");
+
+    if (!container) {
+        return;
+    }
+
+    if (!todayRemainingSandwichOrders) {
+        container.innerHTML = `
+            <h2>Today's Bread Production</h2>
+            <p>No today's production has been loaded.</p>
+        `;
+        return;
+    }
+
+    const products = Object.keys(todayRemainingSandwichOrders);
+    const rows = products.map((product, index) => `
+        <tr>
+            <td>${escapeHtml(product)}</td>
+            <td>${todayFormOrders[product]}</td>
+            <td>
+                <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value="${todayRemainingSandwichOrders[product] || 0}"
+                    data-today-sandwich-input="${index}"
+                >
+            </td>
+            <td>
+                <button type="button" data-today-sandwich-action="decrease" data-today-sandwich-index="${index}">âˆ’</button>
+                <button type="button" data-today-sandwich-action="increase" data-today-sandwich-index="${index}">+</button>
+            </td>
+        </tr>
+    `).join("");
+
+    const breadTotals = calculateBread(todayRemainingSandwichOrders);
+    const breadRows = Object.entries(breadTotals)
+        .map(([bread, units]) => `<tr><td>${escapeHtml(bread)}</td><td>${units}</td></tr>`)
+        .join("");
+
+    container.innerHTML = `
+        <h2>Today's Bread Production</h2>
+        <p>Enter the sandwiches still to be made. Changes require confirmation.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Sandwich</th>
+                    <th>Form Total</th>
+                    <th>Still to Make</th>
+                    <th>Change</th>
+                </tr>
+            </thead>
+            <tbody>${rows || "<tr><td colspan=\"4\">No sandwiches found.</td></tr>"}</tbody>
+        </table>
+        <h3>Bread Reserved for Today</h3>
+        <table>
+            <thead><tr><th>Bread</th><th>Units</th></tr></thead>
+            <tbody>${breadRows || "<tr><td colspan=\"2\">No bread required.</td></tr>"}</tbody>
+        </table>
+    `;
+
+    const productAt = index => products[index];
+
+    container.querySelectorAll("[data-today-sandwich-action]").forEach(button => {
+        button.addEventListener("click", () => {
+            const product = productAt(Number(button.dataset.todaySandwichIndex));
+            const current = Number(todayRemainingSandwichOrders[product]) || 0;
+            const change = button.dataset.todaySandwichAction === "increase" ? 1 : -1;
+            setTodaySandwichQuantity(product, current + change);
+        });
+    });
+
+    container.querySelectorAll("[data-today-sandwich-input]").forEach(input => {
+        input.addEventListener("change", () => {
+            const product = productAt(Number(input.dataset.todaySandwichInput));
+            setTodaySandwichQuantity(product, input.value);
+        });
+    });
+}
+
+
+// ==========================================
+// CALCULATE BREAD UNITS
+// ==========================================
+
+function calculateBread(
+    orders
+) {
+
+    const breadTotals = {};
+
+    for (
+        const product in orders
+    ) {
+
+        const quantity =
+            orders[product];
+
+        const recipe =
+            breadRecipes[product];
+
+        if (!recipe) {
+            continue;
+        }
+
+        if (!recipe.order) {
+            continue;
+        }
+
+        const bread =
+            recipe.bread;
+
+        const unitsNeeded =
+            quantity *
+            recipe.units;
+
+        if (!breadTotals[bread]) {
+            breadTotals[bread] = 0;
+        }
+
+        breadTotals[bread] +=
+            unitsNeeded;
+    }
+
+    return breadTotals;
+}
+
+
+// ==========================================
+// CALCULATE FINAL ORDER
+// ==========================================
+
+function calculateFinalOrder(
+    breadTotals,
+    todayBreadTotals = {}
+) {
+
+    const previousOrder =
+        loadPreviousOrder();
+
+    const previousPackages =
+        previousOrder
+            ? previousOrder.packages
+            : {};
+
+    const currentSupply =
+        getBreadInputValues(
+            "inventory"
+        );
+
+    const finalOrder = {};
+
+    for (const bread of BREAD_TYPES) {
+
+        const sandwichesNeeded =
+            breadTotals[bread] || 0;
+
+        const sandwichesPerPackage =
+            SANDWICHES_PER_PACKAGE[bread];
+
+        const requiredPackages =
+            Math.ceil(
+                sandwichesNeeded /
+                sandwichesPerPackage
+            );
+
+        const previous =
+            previousPackages[bread] || 0;
+
+        const supply =
+            currentSupply[bread] || 0;
+
+        const breadUsed =
+            todayBreadTotals[bread] || 0;
+
+        const adjustedSupplyUnits =
+            Math.max(
+                0,
+                supply * sandwichesPerPackage - breadUsed
+            );
+
+        const packagesToOrder =
+            Math.max(
+                0,
+                Math.ceil(
+                    (
+                        sandwichesNeeded -
+                        previous * sandwichesPerPackage -
+                        adjustedSupplyUnits
+                    ) /
+                    sandwichesPerPackage
+                )
+            );
+
+        finalOrder[bread] = {
+
+            unitsNeeded:
+                sandwichesNeeded,
+
+            requiredPackages:
+                requiredPackages,
+
+            previousOrder:
+                previous,
+
+            currentSupply:
+                supply,
+
+            breadUsed:
+                breadUsed,
+
+            adjustedSupplyUnits:
+                adjustedSupplyUnits,
+
+            packagesToOrder:
+                packagesToOrder
+        };
+    }
+
+    return finalOrder;
+}
+
+
+// ==========================================
+// DISPLAY BREAD RESULTS
+// ==========================================
+
+function displayBreadResults(
+    orders,
+    breadTotals,
+    todayBreadTotals = {}
+) {
+
+    const results =
+        document.getElementById(
+            "results"
+        );
+
+    let html = "";
+
+    html += "<h2>Tomorrow's Production Found</h2>";
+
+    html += `
+        <table>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+            </tr>
+    `;
+
+    for (const product in orders) {
+
+        html += `
+            <tr>
+                <td>${product}</td>
+                <td>${orders[product]}</td>
+            </tr>
+        `;
+    }
+
+    html += "</table>";
+
+    const finalOrder =
+        calculateFinalOrder(
+            breadTotals,
+            todayBreadTotals
+        );
+
+    lastCalculatedOrder =
+        finalOrder;
+
+    html += "<h2>Bread to Order for Tomorrow</h2>";
+
+    html += `
+        <table>
+            <tr>
+                <th>Bread</th>
+                <th>Packages to Order</th>
+            </tr>
+    `;
+
+    for (const bread of BREAD_TYPES) {
+
+        const packages =
+            finalOrder[bread]
+                .packagesToOrder;
+
+        html += `
+            <tr>
+                <td>${bread}</td>
+                <td>
+                    <strong>
+                        ${packages}
+                    </strong>
+                </td>
+            </tr>
+        `;
+    }
+
+    html += "</table>";
+
+    html += `
+        <details class="calculation-details">
+
+            <summary>
+                Show Calculation Details
+            </summary>
+
+            <table>
+
+                <tr>
+                    <th>Bread</th>
+                    <th>Tomorrow Required</th>
+                    <th>Required Packages</th>
+                    <th>Previous Order</th>
+                    <th>Current Supply</th>
+                    <th>Reserved for Today</th>
+                    <th>Supply After Use</th>
+                    <th>To Order</th>
+                </tr>
+    `;
+
+    for (const bread of BREAD_TYPES) {
+
+        const item =
+            finalOrder[bread];
+
+        html += `
+            <tr>
+                <td>${bread}</td>
+                <td>${item.unitsNeeded}</td>
+                <td>${item.requiredPackages}</td>
+                <td>${item.previousOrder}</td>
+                <td>${item.currentSupply}</td>
+                <td>${item.breadUsed}</td>
+                <td>${item.adjustedSupplyUnits} units</td>
+                <td>
+                    <strong>
+                        ${item.packagesToOrder}
+                    </strong>
+                </td>
+            </tr>
+        `;
+    }
+
+    html += `
+            </table>
+
+        </details>
+    `;
+
+    results.innerHTML =
+        html;
+
+    document
+        .getElementById(
+            "saveTodaysOrderButton"
+        )
+        .disabled = false;
+}
+
+
+// ==========================================
+// PUBLIC FUNCTIONS
+// ==========================================
+
+function clearBreadCalculation() {
+    const confirmed = confirm(
+        "Clear the current bread calculation? The saved previous order will not be changed."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    currentFormOrders = null;
+    remainingSandwichOrders = null;
+    todayFormOrders = null;
+    todayRemainingSandwichOrders = null;
+    lastCalculatedOrder = null;
+
+    const fileIds = [
+        "todayPdfFile",
+        "tomorrowPdfFile"
+    ];
+
+    for (const id of fileIds) {
+        const input = document.getElementById(id);
+        if (input) {
+            input.value = "";
+        }
+    }
+
+    const results = document.getElementById("results");
+    if (results) {
+        results.innerHTML = "";
+    }
+
+    const statusIds = [
+        "todayStatus",
+        "status"
+    ];
+
+    for (const id of statusIds) {
+        const status = document.getElementById(id);
+        if (status) {
+            status.textContent = "";
+        }
+    }
+
+    const adjustments = document.getElementById("tomorrowSandwichAdjustments");
+    if (adjustments) {
+        adjustments.innerHTML = "";
+        adjustments.style.display = "none";
+    }
+
+    const todayChoice = document.querySelector(
+        'input[name="todayProductionChoice"][value="yes"]'
+    );
+
+    if (todayChoice) {
+        todayChoice.checked = true;
+    }
+
+    const todayControls = document.getElementById("todayPdfControls");
+    if (todayControls) {
+        todayControls.style.display = "block";
+    }
+
+    const saveButton = document.getElementById("saveTodaysOrderButton");
+    if (saveButton) {
+        saveButton.disabled = true;
+    }
+
+    renderTodayBreadProduction();
+}
+
+function initializeBreadOrder(
+    readPDF
+) {
+
+    createBreadInputs(
+        "inventoryInputs",
+        "inventory"
+    );
+
+    createBreadInputs(
+        "previousOrderInputs",
+        "previous"
+    );
+
+    updatePreviousOrderDisplay();
+
+
+    // ======================================
+    // SAVE PREVIOUS ORDER
+    // ======================================
+
+    document
+        .getElementById(
+            "savePreviousOrderButton"
+        )
+        .addEventListener(
+            "click",
+            function () {
+
+                savePreviousOrder();
+
+                alert(
+                    "Previous order saved."
+                );
+            }
+        );
+
+    document
+        .querySelectorAll(
+            'input[name="todayProductionChoice"]'
+        )
+        .forEach(
+            radio => {
+                radio.addEventListener(
+                    "change",
+                    function () {
+                        const controls =
+                            document.getElementById(
+                                "todayPdfControls"
+                            );
+
+                        const hasTodayProduction =
+                            document.querySelector(
+                                'input[name="todayProductionChoice"]:checked'
+                            ).value === "yes";
+
+                        controls.style.display =
+                            hasTodayProduction ? "block" : "none";
+
+                        if (!hasTodayProduction) {
+                            todayFormOrders = null;
+                            todayRemainingSandwichOrders = null;
+                            renderTodayBreadProduction();
+                        }
+                    }
+                );
+            }
+        );
+
+    document
+        .getElementById(
+            "analyzeTodayButton"
+        )
+        .addEventListener(
+            "click",
+            async function () {
+                const file =
+                    document.getElementById(
+                        "todayPdfFile"
+                    ).files[0];
+
+                const status =
+                    document.getElementById(
+                        "todayStatus"
+                    );
+
+                if (!file) {
+                    status.textContent =
+                        "Please select today's PDF first.";
+                    return;
+                }
+
+                status.textContent =
+                    "Reading today's PDF...";
+
+                try {
+                    const pdfText =
+                        await readPDF(file);
+
+                    todayFormOrders = findProducts(
+                        pdfText,
+                        breadRecipes
+                    );
+
+                    todayRemainingSandwichOrders = {
+                        ...todayFormOrders
+                    };
+
+                    renderTodayBreadProduction();
+
+                    if (lastCalculatedOrder) {
+                        refreshBreadOrderResults();
+                    }
+
+                    status.textContent =
+                        "Today's PDF loaded.";
+                } catch (error) {
+                    console.error(
+                        "Today's bread production error:",
+                        error
+                    );
+
+                    status.textContent =
+                        "There was an error reading today's PDF.";
+                }
+            }
+        );
+
+    document
+        .getElementById(
+            "getBreadOrderButton"
+        )
+        .addEventListener(
+            "click",
+            function () {
+                if (!remainingSandwichOrders) {
+                    document.getElementById("status").textContent =
+                        "Please analyze tomorrow's PDF first.";
+                    return;
+                }
+
+                refreshBreadOrderResults();
+                document.getElementById("status").textContent =
+                    "Bread order calculated.";
+            }
+        );
+
+
+    // ======================================
+    // RESET PREVIOUS ORDER
+    // ======================================
+
+    document
+        .getElementById(
+            "resetPreviousOrderButton"
+        )
+        .addEventListener(
+            "click",
+            function () {
+
+                resetPreviousOrder();
+            }
+        );
+
+    document
+        .getElementById(
+            "clearBreadCalculationButton"
+        )
+        .addEventListener(
+            "click",
+            clearBreadCalculation
+        );
+
+
+    // ======================================
+    // SAVE TODAY'S ORDER
+    // ======================================
+
+    document
+        .getElementById(
+            "saveTodaysOrderButton"
+        )
+        .addEventListener(
+            "click",
+            function () {
+
+                if (
+                    confirm(
+                        "Confirm this bread order and save it as the new saved order?"
+                    )
+                ) {
+                    saveTodaysOrder();
+                }
+
+            }
+        );
+
+
+    // ======================================
+    // ANALYZE BUTTON
+    // ======================================
+
+    document
+        .getElementById(
+            "analyzeButton"
+        )
+        .addEventListener(
+            "click",
+            async function () {
+
+                const file =
+                    document.getElementById(
+                        "tomorrowPdfFile"
+                    ).files[0];
+
+                const status =
+                    document.getElementById(
+                        "status"
+                    );
+
+                const results =
+                    document.getElementById(
+                        "results"
+                    );
+
+
+                if (!file) {
+
+                    status.textContent =
+                        "Please select tomorrow's PDF first.";
+
+                    return;
+                }
+
+
+                status.textContent =
+                    "Reading PDF...";
+
+                results.innerHTML =
+                    "";
+
+                const adjustments =
+                    document.getElementById(
+                            "tomorrowSandwichAdjustments"
+                    );
+
+                if (adjustments) {
+                    adjustments.style.display = "none";
+                    adjustments.innerHTML = "";
+                }
+
+                currentFormOrders = null;
+                remainingSandwichOrders = null;
+
+
+                try {
+
+                    // ==================================
+                    // READ PDF
+                    // ==================================
+
+                    const pdfText =
+                        await readPDF(file);
+
+
+                    status.textContent =
+                        "Finding products...";
+
+
+                    // ==================================
+                    // FIND PRODUCTS
+                    // ==================================
+
+                    const orders =
+                        findProducts(
+                            pdfText,
+                            breadRecipes
+                        );
+
+
+                    currentFormOrders = {
+                        ...orders
+                    };
+
+                    remainingSandwichOrders = {
+                        ...orders
+                    };
+
+                    renderSandwichAdjustments();
+                    lastCalculatedOrder = null;
+
+                    document
+                        .getElementById(
+                            "saveTodaysOrderButton"
+                        )
+                        .disabled = true;
+
+
+                    status.textContent =
+                        "Analysis complete!";
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Bread order error:",
+                        error
+                    );
+
+                    status.textContent =
+                        "There was an error reading the PDF.";
+                }
+            }
+        );
+}
+
+
+
+// ==========================================
+// PREP CALCULATOR
+// ==========================================
+
+// ==========================================
+// PREP PDF ELEMENTS
+// ==========================================
+
+const prepPdfFile =
+    document.getElementById(
+        "prepPdfFile"
+    );
+
+const prepStatus =
+    document.getElementById(
+        "prepStatus"
+    );
+
+const prepCategories =
+    document.getElementById(
+        "prepCategories"
+    );
+
+
+// ==========================================
+// SALAD TYPES
+// ==========================================
+
+const saladProductTypes = {
+
+    // ======================================
+    // LARGE SALADS
+    // ======================================
+
+    "Pork Taco (LG)": {},
+
+    "Sweet Potato and Chicken Green Salad (LG) (Not Available)": {},
+
+    "Blueberry and Strawberry (LG)": {},
+
+    "Harvest (LG)": {},
+
+    "Large Cobb": {},
+
+    "Large Chef Bowl": {},
+
+    "Large Garden": {},
+
+    "Large Spinach Chicken": {},
+
+    "Mediterranean (LG)": {},
+
+    "Mediterranean Small": {},
+
+
+    // ======================================
+    // SMALL SALADS
+    // ======================================
+
+    "Small Chef Bowl MWF": {},
+
+    "Small Garden": {},
+
+    "Small Spinach Chicken": {},
+
+    "Small Truly Berries w/Chicken Bowl": {},
+};
+
+
+// ==========================================
+// COMPOUND TYPES
+// ==========================================
+
+const compoundProductTypes = {
+
+    // ======================================
+    // 8 OZ / SALAD COMPOUNDS
+    // ======================================
+
+    "8oz Orange Peach@": {},
+
+    "8oz Potato W/ Egg": {},
+
+    "8oz Seafood Pasta": {},
+
+    "8oz Strawberry": {},
+
+    "8oz Caprese Bowtie": {},
+
+    "Macaroni Shell 8oz": {},
+
+    "Pico De Gallo 16 oz": {},
+
+    "8oz Baked Potato": {},
+
+    "8oz Deli Pasta": {},
+
+
+    // ======================================
+    // COMPOUNDS
+    // ======================================
+
+    "Broccoli/Kale Slaw": {},
+
+    "Deli Pasta": {},
+
+    "Pico De Gallo": {},
+
+    "Baked Potato": {},
+
+    "Caprese Bowtie": {},
+
+    "Strawberry Salad (S)": {},
+
+    "Broccoli/Slaw Craisin 8oz": {},
+
+    "Edamame Bean Sweet and Spicy": {},
+
+    "Macaroni Shell": {},
+
+    "Orange Peach": {},
+
+    "Potato with Egg": {},
+
+    "Seafood Pasta": {},
+
+
+    // ======================================
+    // LARGE TAKEOUT COMPOUNDS
+    // ======================================
+
+    "Deli Pasta 7.5 lb Bowl Take Out": {},
+
+    "Broccoli/Kale Slaw 5 lb Bowl Take Out": {},
+
+    "Coleslaw 5.5lb Bowl Take Out": {},
+
+
+    // ======================================
+    // OTHER COMPOUNDS
+    // ======================================
+
+    "Charcuterie Cup w/ Hummus": {},
+
+    "Relish Tray Medium Takeout": {},
+
+    "Relish Tray Large Takeout": {},
+
+    "Berry w/ Granola 12 oz Package": {},
+
+    "Bean Dip": {},
+
+    "Charcuterie Box": {},
+
+    "Hummus in a Cambro": {},
+
+    "FILLING Tuna Salad": {},
+
+    "FILLING Egg Salad w/Dill": {},
+
+    "FILLING Chicken Salad W/ Craisin": {},
+
+    "BUTTER Honey 1 #": {},
+
+    "Wild Berry Cream Cheese": {},
+
+    "Plain Cream Cheese": {},
+
+    "Cream Cheese Plain 30 lbs Container": {},
+
+    "Onion and Chives Cream Cheese": {},
+
+    "Strawberry Cream Cheese": {},
+
+    "Honey Nut Cream Cheese": {},
+
+    "DELI HAM Parkerhouse 16 slices/lb": {},
+
+    "DELI HAM Shaved 2.50# Package": {},
+
+    "DELI TURKEY Parkerhouse 16 slices/lb": {},
+
+    "TOMATO Sliced": {},
+
+    "Ranch 2 fl. oz Package": {},
+
+    "Provolone Sliced Bulk/ lbs": {},
+
+    "Berry 9oz Package": {},
+
+    "Relish Tray Small Take out": {},
+
+    "Retail Cheese Tray Large Cube Take Out": {}
+};
+
+
+// ==========================================
+// ALL KNOWN PREP PRODUCTS
+// ==========================================
+
+const allKnownPrepProducts = {
+
+    ...breadRecipes,
+
+    ...saladProductTypes,
+
+    ...compoundProductTypes
+};
+
+
+// ==========================================
+// DISPLAY PRODUCT TYPES
+// ==========================================
+
+function displayProductTypes(
+    containerId,
+    orders,
+    emptyMessage
+) {
+
+    const container =
+        document.getElementById(
+            containerId
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    let html = "";
+
+
+    // ------------------------------------------
+    // Display each product
+    // ------------------------------------------
+
+    for (
+        const product in orders
+    ) {
+
+        html += `
+            <div class="prep-row">
+
+                <span class="prep-name">
+                    ${product}
+                </span>
+
+                <span class="prep-quantity">
+                    ${orders[product]}
+                </span>
+
+            </div>
+        `;
+    }
+
+
+    // ------------------------------------------
+    // Nothing found
+    // ------------------------------------------
+
+    if (!html) {
+
+        html = `
+            <p>
+                ${emptyMessage}
+            </p>
+        `;
+    }
+
+
+    container.innerHTML =
+        html;
+}
+
+
+// ==========================================
+// DISPLAY SANDWICH TYPES
+// ==========================================
+
+function displaySandwichTypes(
+    orders
+) {
+
+    displayProductTypes(
+        "sandwichTypes",
+        orders,
+        "No sandwiches were found in the PDF."
+    );
+}
+
+
+// ==========================================
+// DISPLAY SALAD TYPES
+// ==========================================
+
+function displaySaladTypes(
+    orders
+) {
+
+    displayProductTypes(
+        "saladTypes",
+        orders,
+        "No salads were found in the PDF."
+    );
+}
+
+
+// ==========================================
+// DISPLAY COMPOUND TYPES
+// ==========================================
+
+function displayCompoundTypes(
+    orders
+) {
+
+    displayProductTypes(
+        "compoundTypes",
+        orders,
+        "No compounds were found in the PDF."
+    );
+}
+
+
+// ==========================================
+// DISPLAY NEW PRODUCTS
+// ==========================================
+
+function displayNewProducts(
+    products
+) {
+
+    const container =
+        document.getElementById(
+            "newPrepItems"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    let html = "";
+
+
+    for (
+        const product of products
+    ) {
+
+        html += `
+            <div class="prep-row">
+
+                <span class="prep-name">
+                    ${product.name}
+                </span>
+
+                <span class="prep-quantity">
+                    ${product.quantity}
+                </span>
+
+            </div>
+        `;
+    }
+
+
+    if (!html) {
+
+        container.innerHTML =
+            "";
+
+        return;
+    }
+
+
+    container.innerHTML = `
+
+        <div class="new-prep-items">
+
+            <h3>
+                New item found
+            </h3>
+
+            ${html}
+
+        </div>
+
+    `;
+}
+
+function displayUniquePrepItemTotal(pdfText) {
+    const container = document.getElementById("prepUniqueItemTotal");
+
+    if (!container) {
+        return;
+    }
+
+    const uniqueItems = findUniqueReportItems(pdfText);
+
+    container.textContent =
+        `Unique prep items to produce: ${uniqueItems.length}`;
+}
+
+
+// ==========================================
+// CREATE PRINT SHEET
+// ==========================================
+//
+// Creates a completely separate
+// print-only layout.
+//
+// Page 1 = Sandwiches
+// Page 2 = Salads
+// Page 3 = Compounds
+//
+// ==========================================
+
+function createTraySummary(sandwichEntries) {
+    const sandwichOrders = Object.fromEntries(sandwichEntries);
+    const trayRequirements = calculateTrayRequirements(sandwichOrders);
+    const summary = document.createElement("div");
+
+    summary.className = "prep-tray-summary";
+
+    const items = Object.entries(trayRequirements)
+        .map(([trayType, trayCount]) => `<li>${trayType}: <strong>${trayCount}</strong></li>`)
+        .join("");
+
+    summary.innerHTML = `
+        <h2>Trays Needed</h2>
+        ${items ? `<ul>${items}</ul>` : "<p>No tray-based sandwiches found.</p>"}
+    `;
+
+    return summary;
+}
+
+function createPrintSheet() {
+
+    // --------------------------------------
+    // Remove old print sheet
+    // --------------------------------------
+
+    const oldPrintSheet =
+        document.getElementById(
+            "prepPrintSheet"
+        );
+
+
+    if (oldPrintSheet) {
+
+        oldPrintSheet.remove();
+    }
+
+
+    // --------------------------------------
+    // Get current orders
+    // --------------------------------------
+
+    const prepOrders =
+        window.prepOrders;
+
+
+    if (!prepOrders) {
+
+        console.warn(
+            "No prep orders available for printing."
+        );
+
+        return;
+    }
+
+
+    // ======================================
+    // GET SANDWICHES
+    // ======================================
+
+    const sandwiches =
+        Object.entries(
+            prepOrders.sandwiches || {}
+        );
+
+
+    // ======================================
+    // GET SALADS
+    // ======================================
+
+    const salads =
+        Object.entries(
+            prepOrders.salads || {}
+        );
+
+
+    // ======================================
+    // GET COMPOUNDS
+    // ======================================
+
+    const compounds =
+        Object.entries(
+            prepOrders.compounds || {}
+        );
+
+
+    // ======================================
+    // CREATE PRINT SHEET
+    // ======================================
+
+    const printSheet =
+        document.createElement(
+            "div"
+        );
+
+
+    printSheet.id =
+        "prepPrintSheet";
+
+
+    // ======================================
+    // SANDWICH PAGE
+    // ======================================
+
+    const sandwichPage =
+        document.createElement(
+            "div"
+        );
+
+
+    sandwichPage.className =
+        "prep-print-page";
+
+
+    // --------------------------------------
+    // Heading
+    // --------------------------------------
+
+    const sandwichHeading =
+        document.createElement(
+            "h1"
+        );
+
+
+    sandwichHeading.textContent =
+        "Sandwiches";
+
+
+    sandwichPage.appendChild(
+        sandwichHeading
+    );
+
+    sandwichPage.appendChild(
+        createTraySummary(
+            sandwiches
+        )
+    );
+
+
+    // --------------------------------------
+    // Four-column table
+    // --------------------------------------
+
+    const sandwichTable =
+        document.createElement(
+            "table"
+        );
+
+
+    sandwichTable.className =
+        "prep-print-table";
+
+
+    // --------------------------------------
+    // Table header
+    // --------------------------------------
+
+    const sandwichHeader =
+        document.createElement(
+            "tr"
+        );
+
+
+    sandwichHeader.innerHTML = `
+        <th>Sandwich</th>
+        <th>Total</th>
+        <th>Sandwich</th>
+        <th>Total</th>
+    `;
+
+
+    sandwichTable.appendChild(
+        sandwichHeader
+    );
+
+
+    // ======================================
+    // SPLIT SANDWICHES
+    // ======================================
+
+    const middle =
+        Math.ceil(
+            sandwiches.length / 2
+        );
+
+
+    const leftSandwiches =
+        sandwiches.slice(
+            0,
+            middle
+        );
+
+
+    const rightSandwiches =
+        sandwiches.slice(
+            middle
+        );
+
+
+    const numberOfRows =
+        Math.max(
+            leftSandwiches.length,
+            rightSandwiches.length
+        );
+
+
+    // ======================================
+    // CREATE SANDWICH ROWS
+    // ======================================
+
+    for (
+        let i = 0;
+        i < numberOfRows;
+        i++
+    ) {
+
+        const row =
+            document.createElement(
+                "tr"
+            );
+
+
+        // ----------------------------------
+        // LEFT SANDWICH
+        // ----------------------------------
+
+        if (
+            leftSandwiches[i]
+        ) {
+
+            const [
+                name,
+                quantity
+            ] =
+                leftSandwiches[i];
+
+
+            row.innerHTML += `
+                <td>
+                    ${name}
+                </td>
+
+                <td class="print-total">
+                    ${quantity}
+                </td>
+            `;
+
+        } else {
+
+            row.innerHTML += `
+                <td></td>
+                <td></td>
+            `;
+        }
+
+
+        // ----------------------------------
+        // RIGHT SANDWICH
+        // ----------------------------------
+
+        if (
+            rightSandwiches[i]
+        ) {
+
+            const [
+                name,
+                quantity
+            ] =
+                rightSandwiches[i];
+
+
+            row.innerHTML += `
+                <td>
+                    ${name}
+                </td>
+
+                <td class="print-total">
+                    ${quantity}
+                </td>
+            `;
+
+        } else {
+
+            row.innerHTML += `
+                <td></td>
+                <td></td>
+            `;
+        }
+
+
+        sandwichTable.appendChild(
+            row
+        );
+    }
+
+
+    sandwichPage.appendChild(
+        sandwichTable
+    );
+
+
+    printSheet.appendChild(
+        sandwichPage
+    );
+
+
+    // ======================================
+    // SALAD PAGE
+    // ======================================
+
+    const saladPage =
+        document.createElement(
+            "div"
+        );
+
+
+    saladPage.className =
+        "prep-print-page prep-print-salad-page";
+
+
+    // --------------------------------------
+    // Heading
+    // --------------------------------------
+
+    const saladHeading =
+        document.createElement(
+            "h1"
+        );
+
+
+    saladHeading.textContent =
+        "Salads";
+
+
+    saladPage.appendChild(
+        saladHeading
+    );
+
+
+    // --------------------------------------
+    // Salad table
+    // --------------------------------------
+
+    const saladTable =
+        document.createElement(
+            "table"
+        );
+
+
+    saladTable.className =
+        "prep-print-table";
+
+
+    // --------------------------------------
+    // Salad header
+    // --------------------------------------
+
+    const saladHeader =
+        document.createElement(
+            "tr"
+        );
+
+
+    saladHeader.innerHTML = `
+        <th>Salad</th>
+        <th>Total</th>
+        <th>Salad</th>
+        <th>Total</th>
+    `;
+
+
+    saladTable.appendChild(
+        saladHeader
+    );
+
+
+    // ======================================
+    // SPLIT SALADS
+    // ======================================
+
+    const saladMiddle =
+        Math.ceil(
+            salads.length / 2
+        );
+
+
+    const leftSalads =
+        salads.slice(
+            0,
+            saladMiddle
+        );
+
+
+    const rightSalads =
+        salads.slice(
+            saladMiddle
+        );
+
+
+    const saladRows =
+        Math.max(
+            leftSalads.length,
+            rightSalads.length
+        );
+
+
+    // ======================================
+    // CREATE SALAD ROWS
+    // ======================================
+
+    for (
+        let i = 0;
+        i < saladRows;
+        i++
+    ) {
+
+        const row =
+            document.createElement(
+                "tr"
+            );
+
+
+        // ----------------------------------
+        // LEFT SALAD
+        // ----------------------------------
+
+        if (
+            leftSalads[i]
+        ) {
+
+            const [
+                name,
+                quantity
+            ] =
+                leftSalads[i];
+
+
+            row.innerHTML += `
+                <td>
+                    ${name}
+                </td>
+
+                <td class="print-total">
+                    ${quantity}
+                </td>
+            `;
+
+        } else {
+
+            row.innerHTML += `
+                <td></td>
+                <td></td>
+            `;
+        }
+
+
+        // ----------------------------------
+        // RIGHT SALAD
+        // ----------------------------------
+
+        if (
+            rightSalads[i]
+        ) {
+
+            const [
+                name,
+                quantity
+            ] =
+                rightSalads[i];
+
+
+            row.innerHTML += `
+                <td>
+                    ${name}
+                </td>
+
+                <td class="print-total">
+                    ${quantity}
+                </td>
+            `;
+
+        } else {
+
+            row.innerHTML += `
+                <td></td>
+                <td></td>
+            `;
+        }
+
+
+        saladTable.appendChild(
+            row
+        );
+    }
+
+
+    saladPage.appendChild(
+        saladTable
+    );
+
+
+    printSheet.appendChild(
+        saladPage
+    );
+
+
+    // ======================================
+    // COMPOUND PAGE
+    // ======================================
+
+    const compoundPage =
+        document.createElement(
+            "div"
+        );
+
+
+    compoundPage.className =
+        "prep-print-page prep-print-compound-page";
+
+
+    // --------------------------------------
+    // Heading
+    // --------------------------------------
+
+    const compoundHeading =
+        document.createElement(
+            "h1"
+        );
+
+
+    compoundHeading.textContent =
+        "Compounds";
+
+
+    compoundPage.appendChild(
+        compoundHeading
+    );
+
+
+    // --------------------------------------
+    // Compound table
+    // --------------------------------------
+
+    const compoundTable =
+        document.createElement(
+            "table"
+        );
+
+
+    compoundTable.className =
+        "prep-print-table";
+
+
+    // --------------------------------------
+    // Compound header
+    // --------------------------------------
+
+    const compoundHeader =
+        document.createElement(
+            "tr"
+        );
+
+
+    compoundHeader.innerHTML = `
+        <th>Compound</th>
+        <th>Total</th>
+        <th>Compound</th>
+        <th>Total</th>
+    `;
+
+
+    compoundTable.appendChild(
+        compoundHeader
+    );
+
+
+    // ======================================
+    // SPLIT COMPOUNDS
+    // ======================================
+
+    const compoundMiddle =
+        Math.ceil(
+            compounds.length / 2
+        );
+
+
+    const leftCompounds =
+        compounds.slice(
+            0,
+            compoundMiddle
+        );
+
+
+    const rightCompounds =
+        compounds.slice(
+            compoundMiddle
+        );
+
+
+    const compoundRows =
+        Math.max(
+            leftCompounds.length,
+            rightCompounds.length
+        );
+
+
+    // ======================================
+    // CREATE COMPOUND ROWS
+    // ======================================
+
+    for (
+        let i = 0;
+        i < compoundRows;
+        i++
+    ) {
+
+        const row =
+            document.createElement(
+                "tr"
+            );
+
+
+        // ----------------------------------
+        // LEFT COMPOUND
+        // ----------------------------------
+
+        if (
+            leftCompounds[i]
+        ) {
+
+            const [
+                name,
+                quantity
+            ] =
+                leftCompounds[i];
+
+
+            row.innerHTML += `
+                <td>
+                    ${name}
+                </td>
+
+                <td class="print-total">
+                    ${quantity}
+                </td>
+            `;
+
+        } else {
+
+            row.innerHTML += `
+                <td></td>
+                <td></td>
+            `;
+        }
+
+
+        // ----------------------------------
+        // RIGHT COMPOUND
+        // ----------------------------------
+
+        if (
+            rightCompounds[i]
+        ) {
+
+            const [
+                name,
+                quantity
+            ] =
+                rightCompounds[i];
+
+
+            row.innerHTML += `
+                <td>
+                    ${name}
+                </td>
+
+                <td class="print-total">
+                    ${quantity}
+                </td>
+            `;
+
+        } else {
+
+            row.innerHTML += `
+                <td></td>
+                <td></td>
+            `;
+        }
+
+
+        compoundTable.appendChild(
+            row
+        );
+    }
+
+
+    compoundPage.appendChild(
+        compoundTable
+    );
+
+
+    printSheet.appendChild(
+        compoundPage
+    );
+
+
+    // ======================================
+    // ADD PRINT SHEET TO DOCUMENT
+    // ======================================
+
+    document.body.appendChild(
+        printSheet
+    );
+}
+
+
+// ==========================================
+// INITIALIZE PREP CALCULATOR
+// ==========================================
+
+function clearPrepCalculation() {
+    const confirmed = confirm(
+        "Clear the current prep calculation?"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    if (prepPdfFile) {
+        prepPdfFile.value = "";
+    }
+
+    if (prepStatus) {
+        prepStatus.textContent = "";
+    }
+
+    if (prepCategories) {
+        prepCategories.style.display = "none";
+    }
+
+    for (const id of [
+        "sandwichTypes",
+        "sandwichIngredients",
+        "saladTypes",
+        "saladIngredients",
+        "compoundTypes",
+        "compoundIngredients",
+        "newPrepItems",
+        "prepUniqueItemTotal"
+    ]) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.innerHTML = "";
+        }
+    }
+
+    const printSheet = document.getElementById("prepPrintSheet");
+    if (printSheet) {
+        printSheet.remove();
+    }
+
+    window.prepOrders = null;
+}
+
+function initializePrepCalculator(
+    readPDF
+) {
+
+    if (!prepPdfFile) {
+        return;
+    }
+
+    const clearButton = document.getElementById(
+        "clearPrepCalculationButton"
+    );
+
+    if (clearButton) {
+        clearButton.addEventListener(
+            "click",
+            clearPrepCalculation
+        );
+    }
+
+
+    // ======================================
+    // PRINT BUTTON
+    // ======================================
+
+    const printPrepButton =
+        document.getElementById(
+            "printPrepButton"
+        );
+
+
+    if (printPrepButton) {
+
+        printPrepButton.addEventListener(
+            "click",
+            function () {
+
+                // ----------------------------------
+                // Build dedicated print sheet
+                // ----------------------------------
+
+                createPrintSheet();
+
+
+                // ----------------------------------
+                // Print
+                // ----------------------------------
+
+                window.print();
+
+            }
+        );
+    }
+
+
+    // ======================================
+    // PDF UPLOAD
+    // ======================================
+
+    prepPdfFile.addEventListener(
+        "change",
+        async function () {
+
+            const file =
+                prepPdfFile.files[0];
+
+
+            if (!file) {
+                return;
+            }
+
+
+            // ----------------------------------
+            // Status
+            // ----------------------------------
+
+            prepStatus.textContent =
+                "Reading PDF...";
+
+
+            prepCategories.style.display =
+                "none";
+
+
+            try {
+
+                // ==================================
+                // READ PDF
+                // ==================================
+
+                const prepPdfText =
+                    await readPDF(file);
+
+
+                // ==================================
+                // SANDWICHES
+                // ==================================
+
+                const sandwichOrders =
+                    findProducts(
+                        prepPdfText,
+                        breadRecipes
+                    );
+
+
+                displaySandwichTypes(
+                    sandwichOrders
+                );
+
+
+                // ==================================
+                // SALADS
+                // ==================================
+
+                const saladOrders =
+                    findProducts(
+                        prepPdfText,
+                        saladProductTypes
+                    );
+
+
+                displaySaladTypes(
+                    saladOrders
+                );
+
+
+                // ==================================
+                // COMPOUNDS
+                // ==================================
+
+                const compoundOrders =
+                    findProducts(
+                        prepPdfText,
+                        compoundProductTypes
+                    );
+
+
+                displayCompoundTypes(
+                    compoundOrders
+                );
+
+
+                // ==================================
+                // FIND NEW / UNKNOWN ITEMS
+                // ==================================
+
+                const newPrepItems =
+                    findNewProducts(
+                        prepPdfText,
+                        allKnownPrepProducts
+                    );
+
+
+                displayNewProducts(
+                    newPrepItems
+                );
+
+                const newCompoundOrders = {};
+
+                for (const item of newPrepItems) {
+                    if (item.category === "compound") {
+                        newCompoundOrders[item.name] = item.quantity;
+                    }
+                }
+
+
+                // ==================================
+                // SAVE ALL PREP DATA
+                // ==================================
+
+                window.prepOrders = {
+
+                    sandwiches:
+                        sandwichOrders,
+
+                    salads:
+                        saladOrders,
+
+                    compounds:
+                        {
+                            ...compoundOrders,
+                            ...newCompoundOrders
+                        }
+
+                };
+
+                displayUniquePrepItemTotal(
+                    prepPdfText
+                );
+
+
+                // ==================================
+                // SHOW PREP CATEGORIES
+                // ==================================
+
+                prepStatus.textContent =
+                    "PDF loaded âœ“";
+
+
+                prepCategories.style.display =
+                    "block";
+
+
+            } catch (error) {
+
+                console.error(
+                    "Error reading Prep PDF:",
+                    error
+                );
+
+
+                prepStatus.textContent =
+                    "There was an error reading the PDF.";
+            }
+
+        }
+    );
+}
+
+
+
+const startMenu = document.getElementById("startMenu");
+const orderBreadSection = document.getElementById("orderBreadSection");
+const prepSection = document.getElementById("prepSection");
+
+function showSection(sectionToShow) {
+    startMenu.style.display = sectionToShow === startMenu ? "block" : "none";
+    orderBreadSection.style.display =
+        sectionToShow === orderBreadSection ? "block" : "none";
+    prepSection.style.display = sectionToShow === prepSection ? "block" : "none";
+}
+
+document.getElementById("orderBreadButton").addEventListener("click", () => {
+    showSection(orderBreadSection);
+});
+
+document.getElementById("prepButton").addEventListener("click", () => {
+    showSection(prepSection);
+});
+
+document.getElementById("backToMenuButton").addEventListener("click", () => {
+    showSection(startMenu);
+});
+
+document
+    .getElementById("backToMenuFromPrepButton")
+    .addEventListener("click", () => {
+        showSection(startMenu);
+    });
+
+initializeBreadOrder(readPDF);
+initializePrepCalculator(readPDF);
+
+
 </script>
 
 </body>
 </html>
+
+

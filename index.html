@@ -549,17 +549,17 @@ select {
 }
 
 .prep-category:nth-of-type(1) > summary::before {
-    content: "ðŸ¥ª";
+    content: "1";
     margin-right: 10px;
 }
 
 .prep-category:nth-of-type(2) > summary::before {
-    content: "ðŸ¥—";
+    content: "2";
     margin-right: 10px;
 }
 
 .prep-category:nth-of-type(3) > summary::before {
-    content: "ðŸ§º";
+    content: "3";
     margin-right: 10px;
 }
 
@@ -871,6 +871,8 @@ select {
 }
 
 
+
+
 </style>
 </head>
 
@@ -879,7 +881,13 @@ select {
     <div class="container">
 
         <header class="app-header">
-            <div class="brand-mark" aria-hidden="true">ðŸž</div>
+            <div class="brand-mark" aria-hidden="true">
+                <svg class="brand-icon" viewBox="0 0 64 64" role="img">
+                    <path d="M12 35h40v14H12z" fill="#c98528"/>
+                    <path d="M16 35c1-14 8-21 16-21s15 7 16 21" fill="#f2bb58"/>
+                    <path d="M22 25h2M31 20h2M40 25h2" stroke="#fff5d8" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+            </div>
             <div>
                 <p class="eyebrow">Kitchen production planner</p>
                 <h1>Inventory Calculator</h1>
@@ -899,27 +907,48 @@ select {
                 <h2>What are you doing today?</h2>
 
                 <p>
-                    Choose a workflow to organize todayâ€™s production and tomorrowâ€™s order.
+                    Choose a workflow to organize today's production and tomorrow's order.
                 </p>
 
                 <div class="menu-actions">
                     <button id="orderBreadButton" class="primary-action">
-                        <span aria-hidden="true">ðŸž</span> Order Bread
+                        Order Bread
                     </button>
 
                     <button id="prepButton" class="secondary-action">
-                        <span aria-hidden="true">ðŸ¥—</span> Prep
+                        Prep
                     </button>
                 </div>
             </div>
 
-            <div class="product-visual" aria-label="Bread, sandwich, salad, and production checklist icons">
-                <span class="product-badge product-badge-large">ðŸ¥ª</span>
-                <span class="product-badge product-badge-top">ðŸ¥–</span>
-                <span class="product-badge product-badge-bottom">ðŸ¥—</span>
-                <span class="product-badge product-badge-note">âœ“</span>
+            <div class="product-visual" aria-label="Bread, sandwich, salad, and production checklist illustrations">
+                <span class="product-badge product-badge-large">
+                    <svg class="visual-icon" viewBox="0 0 100 100" aria-hidden="true">
+                        <rect x="18" y="23" width="64" height="22" rx="10" fill="#d9933d"/>
+                        <rect x="16" y="48" width="68" height="11" rx="5" fill="#6f9b57"/>
+                        <rect x="18" y="63" width="64" height="15" rx="7" fill="#d9933d"/>
+                    </svg>
+                </span>
+                <span class="product-badge product-badge-top">
+                    <svg class="visual-icon" viewBox="0 0 100 100" aria-hidden="true">
+                        <path d="M18 59h64v13H18z" fill="#c98528"/>
+                        <path d="M23 59c1-22 12-32 27-32s26 10 27 32" fill="#f1bd61"/>
+                        <path d="M36 43h2M50 36h2M63 43h2" stroke="#fff3d0" stroke-width="4" stroke-linecap="round"/>
+                    </svg>
+                </span>
+                <span class="product-badge product-badge-bottom">
+                    <svg class="visual-icon" viewBox="0 0 100 100" aria-hidden="true">
+                        <path d="M18 49h64l-7 25H25z" fill="#5d9b67"/>
+                        <path d="M27 48c4-15 12-23 19-9 7-22 16-8 17 8" fill="#8bc56f"/>
+                        <path d="M16 48h68" stroke="#2f704d" stroke-width="5" stroke-linecap="round"/>
+                    </svg>
+                </span>
+                <span class="product-badge product-badge-note">
+                    <svg class="visual-icon" viewBox="0 0 48 48" aria-hidden="true">
+                        <path d="M10 25l9 9 19-21" fill="none" stroke="#3f8060" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
             </div>
-
         </div>
 
 
@@ -1036,7 +1065,7 @@ select {
             <div class="section">
 
                 <button id="backToMenuButton">
-                    â† Back
+                    Back
                 </button>
 
             </div>
@@ -1234,7 +1263,7 @@ select {
     <div class="section">
 
         <button id="backToMenuFromPrepButton">
-            â† Back
+            Back
         </button>
 
     </div>
@@ -3513,7 +3542,7 @@ const breadRecipes = {
 
 
     // ======================================
-    // SANDWICHES â€” REFERENCE ONLY
+    // SANDWICHES - REFERENCE ONLY
     // ======================================
     //
     // These are still sandwiches.
@@ -4048,7 +4077,7 @@ function updatePreviousOrderDisplay() {
     if (saved) {
 
         status.textContent =
-            "Previous order loaded âœ“";
+            "Previous order loaded OK";
 
         status.className =
             "saved-status";
@@ -4141,7 +4170,7 @@ function checkPreviousOrderDate() {
     if (!dateMatches) {
 
         warning.innerHTML = `
-            âš ï¸ <strong>Please verify the previous order date.</strong>
+             <strong>Please verify the previous order date.</strong>
             <br>
             Based on the normal ordering schedule,
             the previous order would normally be
@@ -4160,7 +4189,7 @@ function checkPreviousOrderDate() {
     } else {
 
         warning.innerHTML = `
-            âœ“ Previous order date matches the
+            OK Previous order date matches the
             expected ordering schedule.
         `;
 
@@ -4300,7 +4329,7 @@ function renderSandwichAdjustments() {
                     >
                 </td>
                 <td>
-                    <button type="button" data-sandwich-action="decrease" data-sandwich-index="${index}">âˆ’</button>
+                    <button type="button" data-sandwich-action="decrease" data-sandwich-index="${index}">-</button>
                     <button type="button" data-sandwich-action="increase" data-sandwich-index="${index}">+</button>
                 </td>
             </tr>
@@ -4472,7 +4501,7 @@ function renderTodayBreadProduction() {
                         >
                     </td>
                     <td>
-                        <button type="button" data-today-sandwich-action="decrease" data-today-sandwich-index="${index}">âˆ’</button>
+                        <button type="button" data-today-sandwich-action="decrease" data-today-sandwich-index="${index}">-</button>
                         <button type="button" data-today-sandwich-action="increase" data-today-sandwich-index="${index}">+</button>
                     </td>
                 </tr>
@@ -4481,7 +4510,7 @@ function renderTodayBreadProduction() {
 
         return `
             <details class="today-production-dropdown">
-                <summary>${group.label} â€” ${total} sandwich(es)</summary>
+                <summary>${group.label} - ${total} sandwich(es)</summary>
                 <table>
                     <thead>
                         <tr>
@@ -4552,7 +4581,7 @@ function renderTodayBreadProductionLegacy() {
                 >
             </td>
             <td>
-                <button type="button" data-today-sandwich-action="decrease" data-today-sandwich-index="${index}">âˆ’</button>
+                <button type="button" data-today-sandwich-action="decrease" data-today-sandwich-index="${index}">-</button>
                 <button type="button" data-today-sandwich-action="increase" data-today-sandwich-index="${index}">+</button>
             </td>
         </tr>
@@ -6655,7 +6684,7 @@ function initializePrepCalculator(
                 // ==================================
 
                 prepStatus.textContent =
-                    "PDF loaded âœ“";
+                    "PDF loaded OK";
 
 
                 prepCategories.style.display =
@@ -6717,5 +6746,7 @@ initializePrepCalculator(readPDF);
 
 </body>
 </html>
+
+
 
 

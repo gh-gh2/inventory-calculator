@@ -4244,7 +4244,14 @@ function calculateTrayRequirements(orders) {
     }
 
     for (const trayType of Object.keys(trays)) {
-        trays[trayType] = Math.ceil(trays[trayType] / TRAY_CAPACITY[trayType]);
+        const totalSandwiches = trays[trayType];
+        const trayCapacity = TRAY_CAPACITY[trayType];
+        const fullTrays = Math.floor(totalSandwiches / trayCapacity);
+        const remainder = totalSandwiches % trayCapacity;
+
+        trays[trayType] = remainder
+            ? `${fullTrays} trays, ${remainder} left`
+            : `${fullTrays} trays`;
     }
 
     return trays;
